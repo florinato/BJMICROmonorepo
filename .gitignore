@@ -1,0 +1,27 @@
+# Maven
+target/
+.idea/
+*.iml
+.flattened-pom.xml
+
+# Logs
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+.localized
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+*.project
+*.metadata
+.classpath
+
+# Docker
+*.env
