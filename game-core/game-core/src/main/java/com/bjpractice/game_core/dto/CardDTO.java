@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 // PRELIMINAR
 
+@Deprecated
 @Getter
 @RequiredArgsConstructor
 public class CardDTO {
