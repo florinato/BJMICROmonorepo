@@ -4,10 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class AbstractPlayerTest {
+public class AbstractPlayerTest {
 
-    private Player player;  // Usamos Player como implementación concreta para testing
+
+    private Player player;
     private Card ten;
     private Card seven;
     private Card ace;
@@ -22,13 +24,6 @@ class AbstractPlayerTest {
         king = new Card(Card.Suit.DIAMONDS, Card.Rank.KING);
     }
 
-    @Test
-    void testCalculateHandValue_NoAces() {
-        Player player = new Player();
-        player.receiveCard(new Card(Card.Suit.HEARTS, Card.Rank.TEN));
-        player.receiveCard(new Card(Card.Suit.CLUBS, Card.Rank.SEVEN));
-        assertEquals(17, player.calculateHandValue());
-    }
 
     @Test
     void calculateHandValue_noAces_returnsCorrectValue() {
@@ -41,7 +36,7 @@ class AbstractPlayerTest {
     void calculateHandValue_withAceConversion_returnsAdjustedValue() {
         player.receiveCard(ace);
         player.receiveCard(ten);
-        player.receiveCard(seven);  // 11 + 10 + 7 = 28 → 1 + 10 + 7 = 18
+        player.receiveCard(seven);
         assertEquals(18, player.calculateHandValue());
     }
 
@@ -49,7 +44,7 @@ class AbstractPlayerTest {
     @Test
     void isBust_handValueUnder21_returnsFalse() {
         player.receiveCard(ten);
-        player.receiveCard(seven); // 10 + 7 = 17
+        player.receiveCard(seven);
         assertFalse(player.isBust());
     }
 
@@ -57,7 +52,7 @@ class AbstractPlayerTest {
     void isBust_handValueOver21NoAces_returnsTrue() {
         player.receiveCard(ten);
         player.receiveCard(seven);
-        player.receiveCard(king); // 10 + 7 + 10 = 27
+        player.receiveCard(king);
         assertTrue(player.isBust());
     }
 
@@ -65,14 +60,18 @@ class AbstractPlayerTest {
     void isBust_handValueOver21WithAceConversion_returnsFalse() {
         player.receiveCard(ace);
         player.receiveCard(ten);
-        player.receiveCard(seven); // 11 + 10 + 7 = 28 → 1 + 10 + 7 = 18
+        player.receiveCard(seven);
         assertFalse(player.isBust());
     }
 
     @Test
     void isBust_handValueExactly21_returnsFalse() {
         player.receiveCard(ace);
-        player.receiveCard(king); // 11 + 10 = 21
+        player.receiveCard(king);
         assertFalse(player.isBust());
     }
+
+
+
 }
+
