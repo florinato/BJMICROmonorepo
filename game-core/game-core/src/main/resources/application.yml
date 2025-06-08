@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: game-core
+
+  # --- Configuración de la Base de Datos (DataSource) ---
+  datasource:
+    # 1. URL CAMBIADA: Apunta a MySQL en su puerto por defecto (3306)
+    url: jdbc:mysql://localhost:3306/game_core_db?serverTimezone=UTC
+    username: root
+    password: root
+
+  # --- Configuración de JPA / Hibernate ---
+  jpa:
+    # Muestra en la consola el SQL que Hibernate ejecuta.
+    show-sql: true
+    hibernate:
+
+      ddl-auto: update
+    properties:
+      hibernate:
+
+        format_sql: true
+
+        dialect: org.hibernate.dialect.MySQLDialect

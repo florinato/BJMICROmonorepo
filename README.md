@@ -23,3 +23,13 @@ Proyecto modular de Blackjack basado en microservicios, diseñado para escalabil
 
 ```bash
 docker-compose up --build
+
+🔧 JSON Mapping con Hypersistence Utils
+Este proyecto utiliza la librería hypersistence-utils para mapear objetos Java directamente como JSON en columnas SQL (json / jsonb), simplificando el trabajo con estructuras anidadas.
+
+✅ Ventajas
+Serializa y deserializa objetos automáticamente (usando Jackson).
+
+Sin necesidad de @Converter manuales ni configuraciones adicionales.
+
+Compatible con PostgreSQL (jsonb) y MySQL 5.7+ (json).

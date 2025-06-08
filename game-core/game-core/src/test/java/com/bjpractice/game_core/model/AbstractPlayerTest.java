@@ -72,6 +72,57 @@ public class AbstractPlayerTest {
     }
 
 
+    @Test
+    void hasBlackjack_withAceAndTenValueCard_returnsTrue() {
+        player.receiveCard(ace);
+        player.receiveCard(king);  // ACE + KING (10) = 21
+        assertTrue(player.hasBlackjack());
+    }
+
+    @Test
+    void hasBlackjack_withTwoNonAceCardsSumming21_returnsFalse() {
+        player.receiveCard(king);
+        player.receiveCard(ten);
+        player.receiveCard(ace);  // KING + TEN + ACE = 21, pero son 3 cartas
+        assertFalse(player.hasBlackjack());
+    }
+
+    @Test
+    void hasBlackjack_withAceAndNonTenValueCard_returnsFalse() {
+        player.receiveCard(ace);
+        player.receiveCard(seven);  // ACE + SEVEN = 18 (no blackjack)
+        assertFalse(player.hasBlackjack());
+    }
+
+    @Test
+    void hasBlackjack_withNonAceCardsSumming21_returnsFalse() {
+        player.receiveCard(king);
+        player.receiveCard(seven);
+        player.receiveCard(new Card(Card.Suit.HEARTS, Card.Rank.FOUR));  // 10 + 7 + 4 = 21, pero son 3 cartas
+        assertFalse(player.hasBlackjack());
+    }
+
+    @Test
+    void hasBlackjack_withLessThanTwoCards_returnsFalse() {
+        player.receiveCard(ace);  // Solo 1 carta
+        assertFalse(player.hasBlackjack());
+    }
+
+    @Test
+    void clearHand_removesAllCardsFromHand() {
+        // Arrange: Añadimos cartas
+        player.receiveCard(ace);
+        player.receiveCard(king);
+        assertEquals(2, player.getHand().size());  // Verificación previa
+
+        // Act: Limpiamos la mano
+        player.clearHand();
+
+        // Assert: Mano vacía
+        assertTrue(player.getHand().isEmpty());
+        assertEquals(0, player.calculateHandValue());  // Valor debería ser 0
+    }
+
 
 }
 

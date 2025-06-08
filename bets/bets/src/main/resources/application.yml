@@ -1,0 +1,19 @@
+spring:
+  application:
+
+    name: bets
+
+  datasource:
+
+    url: jdbc:mysql://localhost:3306/bets_db?serverTimezone=UTC
+    username: root
+    password: root
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
