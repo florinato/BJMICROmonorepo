@@ -1,9 +1,13 @@
 package com.bjpractice.game_core.model;
 
+import com.bjpractice.game_core.exception.DeckIsEmptyException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+
 
 public class Deck {
 
@@ -30,7 +34,7 @@ public class Deck {
     }
 
     public Card dealCard() {
-        if(deckList.isEmpty()) throw new NoSuchElementException("No cards left in the deck");
+        if(deckList.isEmpty()) throw new DeckIsEmptyException();
         return deckList.remove(0);
     }
 

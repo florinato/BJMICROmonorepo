@@ -1,5 +1,6 @@
 package com.bjpractice.game_core.model;
 
+import com.bjpractice.game_core.exception.InvalidGameActionException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -45,15 +46,17 @@ public class Game {
     // LOGIC
 
     public void startGame() {
-        if (state == GameState.WAITING_TO_START) {
-            deck.initializeDeck();
-            deck.shuffle();
-
-            deck.dealCards(player, 2);
-            deck.dealCards(dealer, 2);
-
-            state = GameState.PLAYER_TURN;
+        if (state != GameState.WAITING_TO_START) {
+            throw new InvalidGameActionException("Action 'start' is not allowed when game state is " + state);
         }
+
+        deck.initializeDeck();
+        deck.shuffle();
+
+        deck.dealCards(player, 2);
+        deck.dealCards(dealer, 2);
+
+        state = GameState.PLAYER_TURN;
     }
 
 
@@ -85,36 +88,49 @@ public class Game {
     // ACTIONS
 
     public void playerHit() {
-        if (state == GameState.PLAYER_TURN) {
-            player.receiveCard(deck.dealCard());
-            if (player.isBust()) {
-                result = GameResult.DEALER_WINS;
-                state = GameState.GAME_OVER;
-            }
+        if (state != GameState.PLAYER_TURN) {
+            throw new InvalidGameActionException("Action 'hit' not allowd when game state is" + state);
+        }
+        player.receiveCard(deck.dealCard());
+        if (player.isBust()) {
+            result = GameResult.DEALER_WINS;
+            state = GameState.GAME_OVER;
         }
     }
 
+
     public void playerStand() {
-        if (state == GameState.PLAYER_TURN) {
+        if (state != GameState.PLAYER_TURN) {
+            throw new InvalidGameActionException("Action stand not allowed when game stateis" + state);
+        }
+        state = GameState.DEALER_TURN;
+        playDealerHand();
+        result = determineWinner();
+        state = GameState.GAME_OVER;
+    }
+
+
+    // La única condición es que haya 2 cartas en mano
+    public void playerDouble() {
+        // 1. Validar el estado general del juego
+        if (state != GameState.PLAYER_TURN) {
+            throw new InvalidGameActionException("Action 'double' is not allowed when game state is " + state);
+        }
+        // 2. Validar la regla específica para la acción de doblar
+        if (player.getHand().size() != 2) {
+            throw new InvalidGameActionException("Action 'double' is only allowed with the initial two cards, but player has " + player.getHand().size() + " cards.");
+        }
+
+        // --- Lógica de la acción si all is correct ---
+        player.receiveCard(deck.dealCard());
+        if (player.isBust()) {
+            result = GameResult.DEALER_WINS;
+        } else {
             state = GameState.DEALER_TURN;
             playDealerHand();
             result = determineWinner();
-            state = GameState.GAME_OVER;
         }
-    }
-
-    public void playerDouble() {
-        if (state == GameState.PLAYER_TURN && player.getHand().size() == 2) {
-            player.receiveCard(deck.dealCard());
-            if (player.isBust()) {
-                result = GameResult.DEALER_WINS;
-            } else {
-                state = GameState.DEALER_TURN;
-                playDealerHand();
-                result = determineWinner();
-            }
-            state = GameState.GAME_OVER;
-        }
+        state = GameState.GAME_OVER;
     }
 
     // TESTING STUFF (Hidden package)
