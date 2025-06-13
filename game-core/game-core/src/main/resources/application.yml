@@ -1,24 +1,36 @@
+server:
+  port: 8081
+
 spring:
   application:
     name: game-core
 
   # --- Configuración de la Base de Datos (DataSource) ---
   datasource:
-    # 1. URL CAMBIADA: Apunta a MySQL en su puerto por defecto (3306)
     url: jdbc:mysql://localhost:3306/game_core_db?serverTimezone=UTC
     username: root
     password: root
 
   # --- Configuración de JPA / Hibernate ---
   jpa:
-    # Muestra en la consola el SQL que Hibernate ejecuta.
     show-sql: true
     hibernate:
-
       ddl-auto: update
     properties:
       hibernate:
-
         format_sql: true
-
         dialect: org.hibernate.dialect.MySQLDialect
+
+  # --- Kafka config (Producer) ---
+  kafka:
+    producer:
+      # CORRECCIÓN: Todas estas propiedades deben estar al mismo nivel de indentación.
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.type.mapping: gameFinished:com.bjpractice.game_core.kafka.event.GameFinishedEvent,playerDoubledDown:com.bjpractice.game_core.kafka.event.PlayerDoubledDownEvent
+
+kafka:
+  topic:
+    games: "games"

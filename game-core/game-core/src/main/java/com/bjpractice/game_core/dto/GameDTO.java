@@ -3,24 +3,20 @@ package com.bjpractice.game_core.dto;
 import com.bjpractice.game_core.model.Game;
 import lombok.Data;
 
-import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
-
-// PRELIMINAR / UNDER CONSTRUCTION
 @Data
 public class GameDTO {
-    private String gameId;
-    private String playerId;
-    private BigDecimal currentBet;
-    private Game.GameState state;
-    private Game.GameResult result;
+
+    private UUID gameId;
+    private Game.GameState gameState;
+    private Game.GameResult gameResult;
+
     private List<CardDTO> playerHand;
+    private int playerScore;
+
     private List<CardDTO> dealerHand;
-//    private boolean canHit; Mirar esto
-//    private boolean canStand;
-//    private boolean canDouble;
-    private Instant createdAt;
-    // Getters y setters
+    private int dealerScore;
+
 }
