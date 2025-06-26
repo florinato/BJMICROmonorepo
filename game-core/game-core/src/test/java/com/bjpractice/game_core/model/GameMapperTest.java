@@ -64,5 +64,86 @@ class GameMapperTest {
     }
 
 
+    @Test
+    @DisplayName ("Juego terminado, cuando se mapea a DTO, la mano del croupier es fully visible")
+    void toDTO_whenGameIsOver_thenDealerHandIsFullyVisible() {
+
+
+        // ARRANGE
+
+        Card playerCard1 = new Card(Card.Suit.CLUBS, Card.Rank.TEN);
+        Card playerCard2 = new Card(Card.Suit.HEARTS, Card.Rank.EIGHT);
+
+        Card dealerCard1 = new Card(Card.Suit.SPADES, Card.Rank.FIVE);
+        Card dealerCard2 = new Card(Card.Suit.DIAMONDS, Card.Rank.ACE);
+
+        Player player = new Player();
+        player.receiveCard(playerCard1);
+        player.receiveCard(playerCard2);
+
+        Dealer dealer = new Dealer();
+        dealer.receiveCard(dealerCard1);
+        dealer.receiveCard(dealerCard2);
+
+        Game gameOver = new Game();
+        gameOver.setPlayerForTesting(player);
+        gameOver.setDealerForTesting(dealer);
+
+
+        gameOver.setStateForTesting(Game.GameState.GAME_OVER);
+
+        GameEntity gameEntity = new GameEntity(UUID.randomUUID(), 123L, UUID.randomUUID());
+        gameEntity.setGameLogic(gameOver);
+
+
+        // ACT
+
+        GameDTO resultDTO = gameMapper.toDTO(gameEntity);
+
+        // ASSSERT
+
+        assertThat(resultDTO).isNotNull();
+
+        assertThat(resultDTO.getDealerHand()).hasSize(2);
+
+        assertThat(resultDTO.getDealerScore()).isEqualTo(16);
+
+
+    }
+
+    @Test
+    @DisplayName("Dado un game entity nulo, cuando se mapea el DTO, entonces el resultado es null")
+    void toDTO_whenEntityIsNull_thenReturnsNull() {
+        // ARRANGE
+        GameEntity nullEntity = null;
+
+        // ACT
+        GameDTO resultDTO = gameMapper.toDTO(nullEntity);
+
+        // ASSERT
+        assertThat(resultDTO).isNull();
+    }
+
+
+    @Test
+    @DisplayName("Dado un GameEntity con gameLogic nulo, cuando se mapea a DTO, entonces el resultado es nulo")
+    void toDTO_whenGameLogicIsNull_thenReturnsNull() {
+        // ARRANGE
+        GameEntity entityWithNullGame = new GameEntity(UUID.randomUUID(), 123L, UUID.randomUUID());
+        entityWithNullGame.setGameLogic(null); // Forzamos que el objeto Game interno sea nulo
+
+        // ACT
+        GameDTO resultDTO = gameMapper.toDTO(entityWithNullGame);
+
+        // ASSERT
+        assertThat(resultDTO).isNull();
+    }
+
+
+
+
+
+
+
 
 }

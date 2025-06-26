@@ -6,6 +6,8 @@ import com.bjpractice.game_core.model.Game;
 import com.bjpractice.game_core.model.GameEntity;
 import com.bjpractice.game_core.model.Card;
 
+import org.springframework.stereotype.Component;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +22,11 @@ import java.util.stream.Collectors;
  * Esto permite que la lógica interna y la API pública evolucionen de forma independiente.
  */
 
+@Component
 public class GameMapper {
 
     public GameDTO toDTO(GameEntity gameEntity){
+
         if (gameEntity == null || gameEntity.getGameLogic() == null){
             return null;
         }
@@ -37,17 +41,21 @@ public class GameMapper {
         dto.setPlayerHand(toCardDTOList(game.getPlayer().getHand()));
         dto.setPlayerScore(game.getPlayer().calculateHandValue());
 
-        // Lógica especial para el dealer: no mostrar la primera carta si el juego no ha terminado
+
         if (game.isGameOver()) {
             dto.setDealerHand(toCardDTOList(game.getDealer().getHand()));
             dto.setDealerScore(game.getDealer().calculateHandValue());
-        } else {
+
             // Si el juego está en curso, solo mostramos la segunda carta del dealer
+        } else {
+
             List<CardDTO> visibleDealerHand = new ArrayList<>();
+
             if (game.getDealer().getHand().size() > 1) {
                 visibleDealerHand.add(toCardDTO(game.getDealer().getHand().get(1)));
             }
             dto.setDealerHand(visibleDealerHand);
+
             // No mostramos la puntuación real del dealer hasta el final
             dto.setDealerScore(game.getDealer().getHand().get(1).getValue());
         }
@@ -55,12 +63,17 @@ public class GameMapper {
         return dto;
     }
 
+    // TODO SONAR
+
     public List<CardDTO> toCardDTOList(List<Card> cards) {
+
         return cards.stream().map(this::toCardDTO).collect(Collectors.toList());
     }
 
     public CardDTO toCardDTO(Card card) {
+
         return new CardDTO(card.getRank().name(), card.getSuit().name());
+
     }
 
 
