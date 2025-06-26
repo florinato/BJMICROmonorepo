@@ -25,7 +25,7 @@ public class BetEntity {
     @Column(nullable = false)
     private Long userId;
 
-    @Column (nullable = false)
+    @Column (nullable = true) // El id se genera en game service
     private UUID gameId;
 
     @Column(nullable = false, precision = 19, scale = 4) // Buena práctica para dinero
@@ -45,10 +45,16 @@ public class BetEntity {
         this.gameId = gameId;
         this.amount = amount;
         this.status = BetStatus.PENDING;
+    }
 
+    public BetEntity(Long userId, BigDecimal amount){
 
-
-
+        this.id = UUID.randomUUID();
+        this.userId = userId;
+        this.amount = amount;
+        this.status = BetStatus.PENDING;
+        this.createdAt = LocalDateTime.now();
+        this.gameId = null;
 
     }
 }
