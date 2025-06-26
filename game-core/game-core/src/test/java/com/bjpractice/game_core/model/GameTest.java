@@ -1,7 +1,9 @@
 package com.bjpractice.game_core.model;
 
 
+import com.bjpractice.game_core.exception.InvalidGameActionException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 
@@ -31,10 +33,9 @@ class GameTest {
         mockPlayer = mock(Player.class);
 
 
-
         game.setPlayerForTesting(mockPlayer);
         game.setDealerForTesting(mockDealer);
-        game.setDeckForTesting(mockDeck); // Inyectar mock
+        game.setDeckForTesting(mockDeck);
         game.setStateForTesting(Game.GameState.WAITING_TO_START);
     }
 
@@ -204,7 +205,7 @@ class GameTest {
 
 
     @Test
-    void isGameOver_ShouldReturnTrue_WhenGameStateIsOver(){
+    void isGameOver_ShouldReturnTrue_WhenGameStateIsOver() {
 
         game.setStateForTesting(Game.GameState.GAME_OVER);
 
@@ -215,7 +216,7 @@ class GameTest {
     }
 
     @Test
-    void isGameOver_ShouldReturnFalse_WhenGameStateIsNotOver(){
+    void isGameOver_ShouldReturnFalse_WhenGameStateIsNotOver() {
 
         game.setStateForTesting(Game.GameState.PLAYER_TURN);
 
@@ -261,17 +262,20 @@ class GameTest {
     }
 
     @Test
-    void playerHit_ShouldDoNothing_WhenNotPlayerTurn() {
+    @DisplayName("Should throw exception for 'hit' when is not the player's turn")
+    void playerHit_ShouldThrowException_WhenNotPlayerTurn() {
 
         game.setStateForTesting(Game.GameState.DEALER_TURN); // Estado incorrecto
 
 
-        game.playerHit();
+        assertThrows(InvalidGameActionException.class, () -> {
+            game.playerHit();
+        });
 
 
         verifyNoInteractions(mockDeck);
         verifyNoInteractions(mockPlayer);
-        assertEquals(Game.GameState.DEALER_TURN, game.getState());
+
     }
 
 
@@ -287,25 +291,28 @@ class GameTest {
         when(mockDealer.calculateHandValue()).thenReturn(17); // Final del dealer
 
 
-
         game.playerStand();
 
 
         assertEquals(Game.GameState.GAME_OVER, game.getState());
-        assertNotNull(game.getResult()); // no sabemos si gana/pierde sin más info
+        assertNotNull(game.getResult());
     }
 
     @Test
-    void playerStand_ShouldDoNothing_WhenNotPlayerTurn() {
+    @DisplayName("Should throw an exception when is not the player turn")
+    void playerStand_ShouldThrowException_WhenNotPlayerTurn() {
 
-        game.setStateForTesting(Game.GameState.DEALER_TURN); // Estado incorrecto
+        game.setStateForTesting(Game.GameState.DEALER_TURN);
+
+        assertThrows(InvalidGameActionException.class, () -> {
+            game.playerStand();
+        });
+
+        // Esta parte nos sirve para que no se ejecute la parte del metodo (Por ej. determine winner) que no es relevante para este test
+        verifyNoInteractions(mockDealer);
+        verifyNoInteractions(mockDeck);
 
 
-        game.playerStand();
-
-
-        assertEquals(Game.GameState.DEALER_TURN, game.getState()); // Estado no cambia
-        verifyNoInteractions(mockDealer); // No se llama a playDealerHand
     }
 
     // DOUBLE
@@ -354,7 +361,6 @@ class GameTest {
         game.setStateForTesting(Game.GameState.PLAYER_TURN);
 
 
-
         List<Card> mockHand = mock(List.class);
         when(mockHand.size()).thenReturn(2);
         when(mockPlayer.getHand()).thenReturn(mockHand);
@@ -363,7 +369,6 @@ class GameTest {
 
 
         game.playerDouble();
-
 
 
         verify(mockPlayer).receiveCard(any(Card.class));
@@ -377,48 +382,42 @@ class GameTest {
     }
 
     @Test
-    void playerDouble_ShouldDoNothing_WhenNotPlayerTurn() {
-        // Arrange
-        game.setStateForTesting(Game.GameState.DEALER_TURN); // Establecemos el estado del juego en el turno del dealer
+    @DisplayName("Should throw exception for 'double' when is not the player's turn")
+    void playerDouble_ShouldThrowException_WhenNotPlayerTurn() {
 
-        // Simulamos que el jugador tiene 2 cartas
-        List<Card> mockHand = new ArrayList<>();
-        mockHand.add(new Card(Card.Suit.HEARTS, Card.Rank.ACE)); // Ejemplo de carta 1
-        mockHand.add(new Card(Card.Suit.CLUBS, Card.Rank.KING)); // Ejemplo de carta 2
+        game.setStateForTesting(Game.GameState.DEALER_TURN);
 
-        when(mockPlayer.getHand()).thenReturn(mockHand); // Mockeamos que el jugador tiene 2 cartas
 
-        // Act
-        game.playerDouble(); // Llamamos al método playerDouble()
+        assertThrows(InvalidGameActionException.class, () -> {
+            game.playerDouble();
+        });
 
-        // Assert
-        verifyNoInteractions(mockDeck); // Verificamos que no se haya interactuado con el mazo (no se deben repartir cartas)
-        assertEquals(Game.GameState.DEALER_TURN, game.getState()); // El estado del juego debe seguir siendo DEALER_TURN
+
+        verifyNoInteractions(mockDeck);
+        verifyNoInteractions(mockPlayer);
     }
 
     @Test
-    void playerDouble_ShouldDoNothing_WhenHandSizeNot2() {
-        // Arrange
-        game.setStateForTesting(Game.GameState.PLAYER_TURN); // Establecemos el estado del juego en el turno del jugador
+    @DisplayName("Should throw exception for 'double' when player hand size is not 2")
+    void playerDouble_ShouldThrowException_WhenHandSizeNot2() {
 
-        // Simulamos que el jugador tiene solo 1 carta (no es válido para doblar)
+        //Arrange
+        game.setStateForTesting(Game.GameState.PLAYER_TURN);
         List<Card> mockHand = new ArrayList<>();
+        mockHand.add(new Card(Card.Suit.HEARTS, Card.Rank.ACE));
+        when(mockPlayer.getHand()).thenReturn(mockHand);
 
-        mockHand.add(new Card(Card.Suit.HEARTS, Card.Rank.ACE)); // Solo 1 carta
+        assertThrows(InvalidGameActionException.class, () -> {
+            game.playerDouble();
+        });
 
-        when(mockPlayer.getHand()).thenReturn(mockHand); // Mockeamos que el jugador tiene 1 carta
+        verifyNoInteractions(mockDeck);
 
-        // Act
-        game.playerDouble(); // Llamamos al método playerDouble()
+        verify(mockPlayer).getHand();
+        verifyNoMoreInteractions(mockPlayer);
 
-        // Assert
-        verifyNoInteractions(mockDeck); // Verificamos que no se haya interactuado con el mazo (no se deben repartir cartas)
-        assertEquals(Game.GameState.PLAYER_TURN, game.getState()); // El estado del juego debe seguir siendo PLAYER_TURN
+
     }
-
-
-
-
 
 
 }

@@ -34,6 +34,7 @@ public class Game {
 
 
     public Game() {
+
         this.player = new Player();
         this.dealer = new Dealer();
         this.deck = new Deck();
@@ -89,7 +90,7 @@ public class Game {
 
     public void playerHit() {
         if (state != GameState.PLAYER_TURN) {
-            throw new InvalidGameActionException("Action 'hit' not allowd when game state is" + state);
+            throw new InvalidGameActionException("Action 'hit' not allowed when game state is" + state);
         }
         player.receiveCard(deck.dealCard());
         if (player.isBust()) {
@@ -110,18 +111,17 @@ public class Game {
     }
 
 
-    // La única condición es que haya 2 cartas en mano
     public void playerDouble() {
-        // 1. Validar el estado general del juego
+
         if (state != GameState.PLAYER_TURN) {
             throw new InvalidGameActionException("Action 'double' is not allowed when game state is " + state);
         }
-        // 2. Validar la regla específica para la acción de doblar
-        if (player.getHand().size() != 2) {
-            throw new InvalidGameActionException("Action 'double' is only allowed with the initial two cards, but player has " + player.getHand().size() + " cards.");
+        int handSize = player.getHand().size();
+        if (handSize != 2) {
+            throw new InvalidGameActionException("Action 'double' is only allowed with the initial two cards, but player has " + handSize +  " cards.");
         }
 
-        // --- Lógica de la acción si all is correct ---
+
         player.receiveCard(deck.dealCard());
         if (player.isBust()) {
             result = GameResult.DEALER_WINS;
@@ -133,7 +133,7 @@ public class Game {
         state = GameState.GAME_OVER;
     }
 
-    // TESTING STUFF (Hidden package)
+    // TESTING STUFF (Private package)
 
     void setStateForTesting(GameState state) {
         this.state = state;
