@@ -1,6 +1,7 @@
 package com.bjpractice.game_core.model;
 
 import com.bjpractice.game_core.exception.InvalidGameActionException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -81,6 +82,7 @@ public class Game {
         }
     }
 
+    @JsonIgnore
     public boolean isGameOver() {
         return state == GameState.GAME_OVER;
     }

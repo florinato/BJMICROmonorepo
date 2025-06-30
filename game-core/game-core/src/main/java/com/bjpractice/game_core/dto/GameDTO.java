@@ -10,6 +10,7 @@ import java.util.UUID;
 public class GameDTO {
 
     private UUID gameId;
+    private Long userId;
     private Game.GameState gameState;
     private Game.GameResult gameResult;
 

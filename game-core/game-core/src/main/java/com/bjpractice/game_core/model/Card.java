@@ -1,11 +1,11 @@
 package com.bjpractice.game_core.model;
 
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
-@RequiredArgsConstructor
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
 @EqualsAndHashCode
 public class Card {
 
@@ -35,11 +35,12 @@ public class Card {
 
 
 
-
+    @JsonIgnore
     public int getValue() {
         return rank.getValue();
     }
 
+    @JsonIgnore
     public boolean isAce() {
         return rank == Rank.ACE;
     }

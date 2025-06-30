@@ -20,3 +20,51 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+
+# ===============================================
+# KAFKA CONFIGURATION (PRELIMINAR!!)
+# ===============================================
+
+  kafka:
+    # --- CONFIGURACIÓN DEL CONSUMIDOR (PARA ESCUCHAR EVENTOS) ---
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: bets-service-group # Identificador del grupo de consumidores
+      auto-offset-reset: earliest # Empieza a leer desde el principio del topic si es un consumidor nuevo
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*" # Permite deserializar objetos de cualquier paquete (conveniente para dev)
+            use:
+              type:
+                headers: false # No usar cabeceras de tipo, el listener especificará la clase
+
+    # --- CONFIGURACIÓN DEL PRODUCTOR (PARA ENVIAR EVENTOS) ---
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring:
+          json:
+            add:
+              type:
+                headers: false # No añadir cabeceras con el tipo de la clase al mensaje
+
+# --- DEFINICIÓN DE NOMBRES DE TOPICS ---
+kafka:
+  topic:
+    games: "games-topic" # Topic del que se leen los resultados de los juegos
+    bets: "bets-topic"
+
+# --- Placeholder para Service Discovery (futura integración con ApiSix/Gateway) ---
+# eureka:
+#   client:
+#     serviceUrl:
+#       defaultZone: http://localhost:8761/eureka/
+#   instance:
+#     prefer-ip-address: true
+

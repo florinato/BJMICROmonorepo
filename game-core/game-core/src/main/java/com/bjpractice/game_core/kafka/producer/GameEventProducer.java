@@ -4,6 +4,7 @@ import com.bjpractice.game_core.kafka.event.PlayerDoubleEvent;
 import com.bjpractice.game_core.kafka.event.GameFinishedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class GameEventProducer {
 
-    private static final String TOPIC_GAMES = "games";
+
+    @Value("${kafka.topic.games}")
+    private String gamesTopic;
 
     private final KafkaTemplate <String, Object> kafkaTemplate;
 
@@ -20,12 +23,14 @@ public class GameEventProducer {
 
         log.info("Sending GameFinishedEvent for game id: {}", event.getGameId());
         try {
-            kafkaTemplate.send(TOPIC_GAMES, event);
+            kafkaTemplate.send(gamesTopic, event);
         } catch (Exception e){
 
             log.error("Error al enviar GameFinishedEvent para gameId: {}", event.getGameId(), e);
             // Aquí se podría implementar una lógica de reintento o de persistencia
             // del evento para no perderlo en caso de que Kafka esté caído.
+
+            // La implementación de desearlo sería un Transactional Outbox pattern (Deuda técnica tbh)
 
         }
     }
@@ -33,7 +38,7 @@ public class GameEventProducer {
     public void sendPlayerDoubledEvent(PlayerDoubleEvent event) {
         log.info("Enviando PlayerDoubledDownEvent para gameId: {}", event.getGameId());
         try {
-            kafkaTemplate.send(TOPIC_GAMES, event);
+            kafkaTemplate.send(gamesTopic, event);
         } catch (Exception e) {
             log.error("Error al enviar PlayerDoubledDownEvent para gameId: {}", event.getGameId(), e);
         }

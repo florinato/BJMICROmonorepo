@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 /**
  * Componente responsable de la transformación entre objetos del dominio y DTOs.
@@ -35,6 +35,7 @@ public class GameMapper {
         GameDTO dto = new GameDTO();
 
         dto.setGameId(gameEntity.getId());
+        dto.setUserId(gameEntity.getUserId());
         dto.setGameState(game.getState());
         dto.setGameResult(game.getResult());
 
@@ -63,11 +64,11 @@ public class GameMapper {
         return dto;
     }
 
-    // TODO SONAR
+
 
     public List<CardDTO> toCardDTOList(List<Card> cards) {
 
-        return cards.stream().map(this::toCardDTO).collect(Collectors.toList());
+        return cards.stream().map(this::toCardDTO).toList();
     }
 
     public CardDTO toCardDTO(Card card) {

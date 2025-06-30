@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.UUID;
 
-import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,5 +19,5 @@ public class GameFinishedEvent {
     private Game.GameResult result;
     private boolean playerHasBlackjack;
 
-    // El campo 'payoutMultiplier' se ha eliminado por completo.
+
 }

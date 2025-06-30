@@ -1,14 +1,16 @@
 package com.bjpractice.game_core.model;
 
 import com.bjpractice.game_core.exception.DeckIsEmptyException;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 
-
+@Setter
+@Getter
 public class Deck {
 
 

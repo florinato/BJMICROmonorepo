@@ -30,7 +30,7 @@ public class GameEntity {
     private UUID id;
 
     @Column(nullable = false)
-    private Long userId;  // TODO  Mirar una vez se cree user si Long es el tipo adecuado
+    private Long userId;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -44,7 +44,7 @@ public class GameEntity {
     private UUID betId;
 
 
-    // TODO check this stuff (The game Enitity relevance as a gate for game logic)
+
 
     @Type(JsonType.class)
     @Column(columnDefinition = "json", nullable = false)
