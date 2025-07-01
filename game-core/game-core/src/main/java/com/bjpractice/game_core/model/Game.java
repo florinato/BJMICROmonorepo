@@ -152,4 +152,8 @@ public class Game {
     void setDealerForTesting(Dealer dealer) {
         this.dealer = dealer;
     }
+
+    void setResultForTesting(Game.GameResult result) {
+        this.result = result;
+    }
 }

@@ -1,4 +1,30 @@
 
+
+
+PLAN DE ATAQUE ACTUAL (MINIMO SERVICIO POSIBLE)
+
+
+Recordando Nuestro Plan: El "Corte Vertical" slice 🔪
+El plan que acordamos no era terminar game-core al 100%, sino construir un "esqueleto funcional" de extremo a extremo. El flujo era:
+
+bets-service: Un usuario crea una apuesta (placeBet).
+
+game-core: El usuario juega la partida usando el betId.
+
+Kafka: game-core notifica el resultado de la partida.
+
+bets-service: Recibe la notificación y actualiza el estado de la apuesta.
+
+Para lograr esto, dijimos que haríamos lo siguiente:
+
+Paso 1 (Casi Completo ✅): Asegurarnos de que game-core puede jugar una partida de principio a fin y, lo más importante, enviar la notificación GameFinishedEvent. El test de playerStand que acabamos de hacer nos da esa garantía.
+
+Paso 2 (Lo que toca ahora 🚀): Enseñar a bets-service a recibir esa notificación.
+
+Paso 3: Probar que la comunicación entre ambos funciona.
+
+
+
 🎯 Foco Principal: Requisitos y Estabilidad
 (Estas son las tareas bloqueantes. Sin esto, el resto del desarrollo se complica).
 

@@ -30,27 +30,20 @@ public class GameCoreService {
     }
 
 
-    public GameDTO startGame(Long userId, UUID betId) {
+    // START GAME
 
+    public GameDTO startGame(Long userId, UUID betId) {
 
         if (gameRepository.findByBetId(betId).isPresent()) {
             throw new BetAlreadyInGameException("Ya existe una partida asociada al betId: " + betId);
         }
 
-
         UUID gameId = UUID.randomUUID();
         GameEntity gameEntity = new GameEntity(gameId, userId, betId);
-
-
         Game game = gameEntity.getGameLogic();
         game.startGame();
 
-
-
-
-
         gameRepository.save(gameEntity);
-
 
         if (game.isGameOver()) {
             GameFinishedEvent event = new GameFinishedEvent(
@@ -63,9 +56,10 @@ public class GameCoreService {
             gameEventProducer.sendGameFinishedEvent(event);
         }
 
-
         return gameMapper.toDTO(gameEntity);
     }
+
+    // HIT
 
     public GameDTO playerHit(UUID gameId) {
 
