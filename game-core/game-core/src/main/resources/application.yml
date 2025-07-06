@@ -24,13 +24,12 @@ spring:
   # --- Kafka config (Producer) ---
   kafka:
     producer:
-      # CORRECCIÓN: Todas estas propiedades deben estar al mismo nivel de indentación.
       bootstrap-servers: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.type.mapping: gameFinished:com.bjpractice.game_core.kafka.event.GameFinishedEvent,playerDoubledDown:com.bjpractice.game_core.kafka.event.PlayerDoubledDownEvent
+      # El bloque "properties" que causaba el error ha sido eliminado.
 
+# --- Propiedades personalizadas de la aplicación ---
 kafka:
   topic:
-    games: "games"
+    games: "games-topic"

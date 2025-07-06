@@ -32,8 +32,8 @@ class GameMapperTest {
         Long userId = 123L;
         UUID betId = UUID.randomUUID();
 
-        Card dealerCard1_hidden = new Card(Card.Suit.CLUBS, Card.Rank.SEVEN);
-        Card dealerCard2_visible = new Card(Card.Suit.SPADES, Card.Rank.QUEEN);
+        Card dealerCard1_visible = new Card(Card.Suit.CLUBS, Card.Rank.SEVEN);
+        Card dealerCard2_hidden = new Card(Card.Suit.SPADES, Card.Rank.QUEEN);
 
         GameEntity gameEntity = GameEntityTestBuilder.createGameInProgressWithSpecificCards(
                 userId,
@@ -43,8 +43,8 @@ class GameMapperTest {
                         new Card(Card.Suit.SPADES, Card.Rank.FIVE)
                 ),
                 List.of(
-                        dealerCard1_hidden,
-                        dealerCard2_visible
+                        dealerCard1_visible,
+                        dealerCard2_hidden
                 )
 
         );
@@ -55,10 +55,10 @@ class GameMapperTest {
         assertThat(resultDTO.getDealerHand()).hasSize(1);
 
         CardDTO visibleDealerCardDTO = resultDTO.getDealerHand().get(0);
-        assertThat(visibleDealerCardDTO.getRank()).isEqualTo(dealerCard2_visible.getRank().name());
-        assertThat(visibleDealerCardDTO.getSuit()).isEqualTo(dealerCard2_visible.getSuit().name());
+        assertThat(visibleDealerCardDTO.getRank()).isEqualTo(dealerCard1_visible.getRank().name());
+        assertThat(visibleDealerCardDTO.getSuit()).isEqualTo(dealerCard1_visible.getSuit().name());
 
-        assertThat(resultDTO.getDealerScore()).isEqualTo(dealerCard2_visible.getValue());
+        assertThat(resultDTO.getDealerScore()).isEqualTo(dealerCard1_visible.getValue());
 
 
     }

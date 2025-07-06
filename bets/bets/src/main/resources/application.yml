@@ -15,7 +15,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
         format_sql: true
@@ -34,10 +34,11 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        # Aquí es donde van las propiedades del deserializador
+
         spring.json.trusted.packages: "*"
-        # Esta es la línea clave, correctamente indentada bajo 'properties'
+
         spring.json.value.default.type: com.bjpractice.bets.kafka.event.GameFinishedEvent
+        spring.json.use.type.headers: false
 
     # --- CONFIGURACIÓN DEL PRODUCTOR (PARA ENVIAR EVENTOS) ---
     producer:

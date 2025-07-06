@@ -1,78 +1,32 @@
 
 
+THE ROADMAP (FINAL PHASE)
 
-PLAN DE ATAQUE ACTUAL (MINIMO SERVICIO POSIBLE)
+Fase 1: Solidificar la Lógica de Negocio Central (Ahora)
+Qué: Terminar la lógica de game-core (acción de double, etc.) y la de bets-service (actualizar la apuesta con el resultado y, en el futuro, gestionar el pago). Básicamente, completar el "happy path" y los casos de error lógicos.
 
+Por qué: Es la base de todo. No podemos proteger, empaquetar o desplegar una aplicación que no es funcionalmente completa. Es el momento de añadir valor de negocio directo.
 
-Recordando Nuestro Plan: El "Corte Vertical" slice 🔪
-El plan que acordamos no era terminar game-core al 100%, sino construir un "esqueleto funcional" de extremo a extremo. El flujo era:
+Fase 2: Tests de Integración Automatizados (Testcontainers)
+Qué: Ahora que la comunicación Kafka funciona (probada manualmente), es el momento de automatizar esa "prueba de fuego". Usaremos Testcontainers para levantar un broker de Kafka real durante la ejecución de los tests de Maven. Esto nos permitirá tener un test que arranque ambos servicios y verifique la comunicación sin necesidad de Postman ni de tener Kafka instalado.
 
-bets-service: Un usuario crea una apuesta (placeBet).
+Por qué: Esto crea una red de seguridad robusta y automática. Garantiza que futuros cambios no rompan la comunicación entre servicios y es esencial para cualquier sistema de Integración Continua (CI/CD).
 
-game-core: El usuario juega la partida usando el betId.
+Fase 3: Containerización (Docker)
+Qué: Crear un Dockerfile para cada uno de tus microservicios (game-core, bets-service, etc.). Luego, crear un fichero docker-compose.yml que defina y orqueste toda la pila de la aplicación (la base de datos MySQL, Kafka, y tus servicios).
 
-Kafka: game-core notifica el resultado de la partida.
+Por qué: Docker te permite empaquetar tus aplicaciones y sus dependencias, asegurando que funcionan igual en tu máquina, en la de otro desarrollador o en producción. Docker Compose es la herramienta perfecta para levantar todo tu entorno local con un solo comando.
 
-bets-service: Recibe la notificación y actualiza el estado de la apuesta.
+Fase 4: Implementar la Capa de Seguridad (auth-service y user-service)
+Qué: Dar vida a user-service para gestionar los datos de los usuarios y a auth-service para gestionar el login y la emisión de tokens (ej. JWT).
 
-Para lograr esto, dijimos que haríamos lo siguiente:
+Por qué: La seguridad es una capa fundamental que se construye sobre una aplicación funcional. No puedes asegurar algo que todavía no existe o no funciona.
 
-Paso 1 (Casi Completo ✅): Asegurarnos de que game-core puede jugar una partida de principio a fin y, lo más importante, enviar la notificación GameFinishedEvent. El test de playerStand que acabamos de hacer nos da esa garantía.
+Fase 5: Integrar el API Gateway (APISIX)
+Qué: Como bien dices, este es el momento de configurar APISIX. Lo configurarás para que sea la única puerta de entrada. Su principal trabajo será interceptar las peticiones, validar el token JWT que le envíe el cliente, y si es válido, inyectar la cabecera X-User-ID antes de pasar la petición al microservicio correspondiente.
 
-Paso 2 (Lo que toca ahora 🚀): Enseñar a bets-service a recibir esa notificación.
-
-Paso 3: Probar que la comunicación entre ambos funciona.
-
-
-
-🎯 Foco Principal: Requisitos y Estabilidad
-(Estas son las tareas bloqueantes. Sin esto, el resto del desarrollo se complica).
-
-Entender el Dominio USER
-
-[ ] Leer el documento de requisitos: KafkaBlackJack.odt.
-Objetivo: Tener claras las reglas de negocio antes de escribir más código para el microservicio user.
-Estabilizar el Entorno Local
-
-[ ] Levantar cada microservicio (game-core, bets, user, auth) de forma individual.
-[ ] Validar que cada uno arranca sin errores y responde en su endpoint de salud (/actuator/health).
-Objetivo: Asegurar que la base del proyecto es funcional y podemos desarrollar sobre seguro.
+Por qué: El Gateway depende de que el servicio de autenticación ya exista para poder validar los tokens. Es el portero que necesita que el sistema de llaves (auth) ya esté funcionando.
 
 
-✅ Siguiente Paso: Confianza y Calidad del Código
-(Una vez que todo arranca, aseguramos una calidad mínima para no arrastrar problemas).
-
-Testing para KAFKA
-Preparar testcontainers
-
-[ ] user: Crear un test básico que verifique que el contexto de Spring carga (@SpringBootTest).
-[ ] auth: Crear un test básico que verifique que el contexto de Spring carga.
-[ ] bets: (Si no lo tiene ya) test básico de carga de contexto.
-Objetivo: Ganar confianza. Si este test pasa, sabemos que la configuración, inyección de dependencias y componentes principales del micro están bien.
-Mejorar Cobertura de Tests (Enfoque 80/20)
-
-[ ] Identificar las 1-2 clases más críticas de cada microservicio (probablemente las clases de Service o de lógica de dominio).
-[ ] Añadir los tests unitarios que falten para cubrir la lógica de negocio principal de esas clases.
-Objetivo: No buscamos 100% de cobertura, sino asegurar que el corazón de nuestra aplicación está bien probado.
-Revisión con SonarQube
-
-[ ] Lanzar un análisis de SonarQube.
-[ ] Corregir únicamente los errores Blocker y Critical que encuentre. Ignorar el resto por ahora.
-Objetivo: Eliminar los problemas más graves de forma rápida y continuar.
-
-
-🚀 A Futuro / Opcional
-(Tareas para cuando haya tiempo o se conviertan en una necesidad).
-
-Preparar Dockerización
-
-[ ] Crear un Dockerfile base para el microservicio más estable.
-[ ] Empezar a documentar los puertos y variables de entorno necesarias para cada servicio en un README.md.
-Documentación Mínima Vital
-
-[ ] En el README.md principal, añadir una sección "Cómo arrancar el proyecto" que liste los microservicios y sus puertos.
-Objetivo: Que tu "yo" del futuro no te odie. No es documentar la API, es dejar una nota de cómo funciona el puzzle.
-
-----------------------------------------------
 
 

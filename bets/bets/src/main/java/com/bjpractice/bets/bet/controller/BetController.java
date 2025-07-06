@@ -1,23 +1,33 @@
 package com.bjpractice.bets.bet.controller;
 
+import com.bjpractice.bets.bet.BetDTO;
+import com.bjpractice.bets.bet.CreateBetRequest;
+import com.bjpractice.bets.bet.service.BetService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-// UNDER CONSTRUCTION
+@RestController
+@RequestMapping("api/v1/bets")
+public class BetController {
+
+    private final BetService betService;
+
+    public BetController(BetService betService) {
+
+        this.betService = betService;
+    }
+
+    @PostMapping
+    public ResponseEntity<BetDTO> placeBet(
+            @RequestHeader("X-User-ID") Long userId,
+            @RequestBody CreateBetRequest request)
+
+    {
+
+        BetDTO newBet = betService.placeBet(userId, request.amount());
+        return ResponseEntity.status(HttpStatus.CREATED).body(newBet);
+    }
 
 
-//@RestController
-//@RequestMapping("/api/bets")
-//public class BetsController {
-//
-//    private final BetService betService;
-//    // ... constructor ...
-//
-//    @PostMapping
-//    public ResponseEntity<BetDTO> placeBet(
-//            @RequestHeader("X-User-ID") Long userId, // <-- APISIX nos lo da aquí
-//            @RequestBody CreateBetRequest betRequest // <-- El cuerpo ya no necesita el userId
-//    ) {
-//        // Le pasamos al servicio el userId que vino de la cabecera
-//        BetDTO newBet = betService.placeBet(userId, betRequest.getAmount());
-//        return ResponseEntity.status(HttpStatus.CREATED).body(newBet);
-//    }
-//}
+}

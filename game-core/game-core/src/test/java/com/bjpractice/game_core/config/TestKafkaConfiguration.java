@@ -17,7 +17,6 @@ public class TestKafkaConfiguration {
 
         return Mockito.mock(GameEventProducer.class);
 
-
     }
 
 }

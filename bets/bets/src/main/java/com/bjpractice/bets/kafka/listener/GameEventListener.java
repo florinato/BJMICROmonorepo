@@ -1,5 +1,7 @@
 package com.bjpractice.bets.kafka.listener;
 
+
+import com.bjpractice.bets.bet.service.BetService;
 import com.bjpractice.bets.kafka.event.GameFinishedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +12,11 @@ import org.springframework.stereotype.Component;
 public class GameEventListener {
 
     private static final Logger log = LoggerFactory.getLogger(GameEventListener.class);
+    private final BetService betService;
+
+    public GameEventListener(BetService betService) {
+        this.betService = betService;
+    }
 
     @KafkaListener(
     topics = "${kafka.topic.games}",
@@ -17,8 +24,8 @@ public class GameEventListener {
             )
     public void handleGameFinishedEvent(GameFinishedEvent event){
 
-        log.info("Received GameFinishedEvent for betId: {}", event.betId());
-
+        log.info("SUCCESS: Received GameFinishedEvent for betId:  {}", event.betId());
+        betService.processGameResult(event);
         // PLACEHOLDER PAL FUTURO
         // Aquí es donde, en el futuro, buscaríamos la apuesta por su betId
         // y la actualizaríamos con el resultado del juego.

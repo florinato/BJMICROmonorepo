@@ -1,9 +1,8 @@
 package com.bjpractice.bets.bet.model;
 
 public enum BetStatus {
-    PENDING,
+    PENDING_GAME,
     WON,
     LOST,
-    PUSH,
-    SETTLED
+    PUSH
 }

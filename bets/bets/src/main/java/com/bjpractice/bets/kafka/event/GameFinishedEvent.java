@@ -8,7 +8,7 @@ public record GameFinishedEvent(
         UUID betId,
         Long userId,
         String result,
-        boolean playerHasBlackJack
+        boolean playerHasBlackjack
 ) {
 
 

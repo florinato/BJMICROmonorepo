@@ -52,13 +52,13 @@ public class GameMapper {
 
             List<CardDTO> visibleDealerHand = new ArrayList<>();
 
-            if (game.getDealer().getHand().size() > 1) {
-                visibleDealerHand.add(toCardDTO(game.getDealer().getHand().get(1)));
+            if (game.getDealer().getHand().size() > 0) {
+                visibleDealerHand.add(toCardDTO(game.getDealer().getHand().get(0)));
             }
             dto.setDealerHand(visibleDealerHand);
 
             // No mostramos la puntuación real del dealer hasta el final
-            dto.setDealerScore(game.getDealer().getHand().get(1).getValue());
+            dto.setDealerScore(game.getDealer().getHand().get(0).getValue());
         }
 
         return dto;
