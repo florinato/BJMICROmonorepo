@@ -17,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Builder
+@Builder  // Construcción más precisa de la entidad para asegurarnos qu en la creación el id sea null (Debe crearlo GeneratedValue)
 @Table(name = "bets")
 public class BetEntity {
 

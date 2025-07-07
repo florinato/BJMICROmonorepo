@@ -6,6 +6,7 @@ import com.bjpractice.bets.bet.model.BetStatus;
 import com.bjpractice.bets.bet.repository.BetRepository;
 import com.bjpractice.bets.bet.BetDTO;
 import com.bjpractice.bets.bet.BetMapper;
+import com.bjpractice.bets.exception.InvalidBetAmountException;
 import com.bjpractice.bets.kafka.event.GameFinishedEvent;
 import com.bjpractice.bets.kafka.listener.GameEventListener;
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ public class BetService {
     private final BetMapper betMapper;
     private static final Logger log = LoggerFactory.getLogger(BetService.class);
 
-    public BetService(BetRepository betRepository, BetMapper betMapper){
+    public BetService(BetRepository betRepository, BetMapper betMapper) {
         this.betRepository = betRepository;
         this.betMapper = betMapper;
     }
@@ -34,7 +35,7 @@ public class BetService {
     public BetDTO placeBet(Long userId, BigDecimal amount) {
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            // throw new InvalidBetAmountException("El monto de la apuesta debe ser positivo.");
+            throw new InvalidBetAmountException("El monto de la apuesta debe ser positivo.");
         }
 
 
@@ -48,24 +49,52 @@ public class BetService {
         return betMapper.toDTO(savedBet);
     }
 
-    public void processGameResult(GameFinishedEvent event){
+
+    public void processGameResult(GameFinishedEvent event) {
         BetEntity bet = betRepository.findById(event.betId())
-                .orElseThrow(()-> new RuntimeException("Bet not found for id "+ event.betId()));
+                .orElseThrow(() -> new RuntimeException("Bet not found for id " + event.betId()));
 
-        switch (event.result()){
+        BigDecimal totalReturned = BigDecimal.ZERO;
 
-            case "PLAYER_WINS" -> bet.setStatus(BetStatus.WON);
+        switch (event.result()) {
+
+            case "PLAYER_WINS" -> {
+                bet.setStatus(BetStatus.WON);
+
+                BigDecimal payout;
+                if (event.playerHasBlackjack()) {
+                    payout = bet.getAmount().multiply(new BigDecimal("1.5"));
+                } else {
+                    payout = bet.getAmount();
+                }
+
+                totalReturned = bet.getAmount().add(payout);
+
+                log.info("PAYOUT para userId {}: Devolviendo {} (apuesta de {} + ganancia de {})",
+                        bet.getUserId(), totalReturned, bet.getAmount(), payout);
+
+
+
+            }
             case "DEALER_WINS" -> bet.setStatus(BetStatus.LOST);
-            case "PUSH" -> bet.setStatus(BetStatus.PUSH);
-            default -> throw new IllegalArgumentException("Resultado del juego desconocido "+ event.result());
+            case "PUSH" -> {
+                bet.setStatus(BetStatus.PUSH);
+                totalReturned = bet.getAmount();
+
+            }
+            default -> throw new IllegalArgumentException("Resultado del juego desconocido " + event.result());
         }
 
         betRepository.save(bet);
         log.info("Bet{} actualizada a estado {}", bet.getId(), bet.getStatus());
 
+        if (totalReturned.compareTo(BigDecimal.ZERO) > 0) {
+            log.info("PAYOUT/RETURN para userId {}: Devolviendo un total de {}", bet.getUserId(), totalReturned);
+            // TODO: Llamada a user-service para acreditar 'totalReturned' al usuario.
+
     }
 
 
-
+}
 
 }

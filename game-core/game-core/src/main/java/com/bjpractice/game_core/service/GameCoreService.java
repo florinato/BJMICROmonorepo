@@ -90,6 +90,8 @@ public class GameCoreService {
     }
 
 
+    // STAND
+
     public GameDTO playerStand(UUID gameId) {
 
         GameEntity gameEntity = gameRepository.findById(gameId)
