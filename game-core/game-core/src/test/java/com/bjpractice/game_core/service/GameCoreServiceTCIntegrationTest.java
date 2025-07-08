@@ -2,6 +2,7 @@ package com.bjpractice.game_core.service;
 
 import com.bjpractice.game_core.integration.AbstractIntegrationTest;
 import com.bjpractice.game_core.kafka.event.GameFinishedEvent;
+import com.bjpractice.game_core.kafka.event.PlayerDoubleEvent;
 import com.bjpractice.game_core.model.Card;
 import com.bjpractice.game_core.model.Game;
 import com.bjpractice.game_core.model.GameEntity;
@@ -113,5 +114,37 @@ public class GameCoreServiceTCIntegrationTest extends AbstractIntegrationTest {
         assertNotNull(receivedEvent);
         assertEquals(gameEntity.getBetId(), receivedEvent.getBetId());
         assertEquals(Game.GameResult.DEALER_WINS, receivedEvent.getResult(), "El resultado debería ser DEALER_WINS porque el jugador se pasó");
+    }
+
+
+    @Test
+    @DisplayName("[TC] When player doubles down, should publish PlayerDoubleEvent and GameFinishedEvent")
+    void playerDouble_shouldPublishTwoEvents() {
+
+        GameEntity gameEntity = GameEntityTestBuilder.createGameInPlayerTurn(1L, UUID.randomUUID());
+        gameRepository.save(gameEntity);
+
+        gameCoreService.playerDouble(gameEntity.getId());
+
+        // Usamos el segundo helper para construir dos eventos
+        ConsumerRecords<String, Object> records = consumeEvents(gamesTopic, 2);
+
+        PlayerDoubleEvent playerDoubleEvent = null;
+        GameFinishedEvent gameFinishedEvent = null;
+
+        for (var record : records) {
+            if (record.value() instanceof PlayerDoubleEvent) {
+                playerDoubleEvent = (PlayerDoubleEvent) record.value();
+            } else if (record.value() instanceof GameFinishedEvent) {
+                gameFinishedEvent = (GameFinishedEvent) record.value();
+            }
+        }
+
+        assertNotNull(playerDoubleEvent, "Se esperaba un PlayerDoubleEvent");
+        assertEquals(gameEntity.getBetId(), playerDoubleEvent.getBetId());
+
+        assertNotNull(gameFinishedEvent, "Se esperaba un GameFinishedEvent");
+        assertEquals(gameEntity.getBetId(), gameFinishedEvent.getBetId());
+
     }
 }

@@ -7,6 +7,7 @@ import com.bjpractice.bets.bet.repository.BetRepository;
 import com.bjpractice.bets.client.UserServiceClient;
 import com.bjpractice.bets.config.TestUserClientConfiguration;
 import com.bjpractice.bets.kafka.event.GameFinishedEvent;
+import com.bjpractice.bets.kafka.event.PlayerDoubleEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import com.bjpractice.bets.kafka.listener.GameEventListener;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -36,12 +38,14 @@ class BetServiceTest {
     private final BetService betService;
     private final BetRepository betRepository;
     private final UserServiceClient userServiceClient;
+    private final GameEventListener gameEventListener;
 
     @Autowired
-    public BetServiceTest(BetService betService, BetRepository betRepository, UserServiceClient userServiceClient) {
+    public BetServiceTest(BetService betService, BetRepository betRepository, UserServiceClient userServiceClient, GameEventListener gameEventListener) {
         this.betService = betService;
         this.betRepository = betRepository;
         this.userServiceClient = userServiceClient;
+        this.gameEventListener = gameEventListener;
     }
 
     @BeforeEach
@@ -253,6 +257,42 @@ class BetServiceTest {
         assertEquals(1L, userIdCaptor.getValue());
         assertEquals(0, expectedCredit.compareTo(amountCaptor.getValue()), "Se debe devolver la apuesta original de 10.00");
     }
+
+
+    @Test
+    @DisplayName("When PlayerDoubleEvent is received, should double the bet amount")
+    void handlePlayerDouble_shouldDoubleBetAmount() {
+        // --- Arrange ---
+
+        BetEntity originalBet = BetEntity.builder()
+                .userId(1L)
+                .amount(new BigDecimal("10.00"))
+                .status(BetStatus.PENDING_GAME)
+                .build();
+        BetEntity savedBet = betRepository.save(originalBet);
+        UUID betId = savedBet.getId();
+
+
+        PlayerDoubleEvent doubleEvent = new PlayerDoubleEvent(
+                UUID.randomUUID(),
+                betId,
+                1L
+        );
+
+
+        BigDecimal expectedAmount = new BigDecimal("20.00");
+
+        // --- Act ---
+
+        gameEventListener.handlePlayerDouble(doubleEvent);
+
+        // --- Assert ---
+
+        BetEntity updatedBet = betRepository.findById(betId).get();
+        assertEquals(0, expectedAmount.compareTo(updatedBet.getAmount()), "El monto de la apuesta debería haberse duplicado a 20.00");
+    }
+
+
 
 
 }

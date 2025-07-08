@@ -9,6 +9,7 @@ import com.bjpractice.bets.bet.BetMapper;
 import com.bjpractice.bets.client.UserServiceClient;
 import com.bjpractice.bets.exception.InvalidBetAmountException;
 import com.bjpractice.bets.kafka.event.GameFinishedEvent;
+import com.bjpractice.bets.kafka.event.PlayerDoubleEvent;
 import com.bjpractice.bets.kafka.listener.GameEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +98,24 @@ public class BetService {
         }
 
 
+    }
+
+
+
+    public void processPlayerDouble(PlayerDoubleEvent event) {
+        // Buscamos la apuesta usando el betId que viene en el evento
+        BetEntity bet = betRepository.findById(event.betId())
+                .orElseThrow(() -> new RuntimeException("Bet not found for id " + event.betId()));
+
+        // Calculamos el nuevo monto
+        BigDecimal originalAmount = bet.getAmount();
+        BigDecimal newAmount = originalAmount.multiply(BigDecimal.valueOf(2));
+
+        // Actualizamos la entidad
+        bet.setAmount(newAmount);
+        betRepository.save(bet);
+
+        log.info("Apuesta {} (userId: {}) doblada. Nuevo monto: {}", bet.getId(), bet.getUserId(), newAmount);
     }
 
 }
