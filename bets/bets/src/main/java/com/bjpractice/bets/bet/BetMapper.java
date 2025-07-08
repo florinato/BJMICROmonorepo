@@ -5,8 +5,10 @@ import org.springframework.stereotype.Component;
 
 /**
  * Componente responsable de la transformación entre la entidad BetEntity y el DTO BetDTO.
- * Desacopla el modelo de persistencia del contrato de la API.
+ * Des (copla el modelo de persistencia del contrato de la API.
  */
+
+// pensar @Mapper(componentModel = "spring") (Hay que añadir dependencias) y la clase se vuelve menos verbosa
 @Component // Lo marcamos como un componente de Spring para poder inyectarlo en el servicio
 public class BetMapper {
 

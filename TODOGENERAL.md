@@ -4,6 +4,11 @@ THE ROADMAP (FINAL PHASE)
 
 Fase 1: Solidificar la Lógica de Negocio Central (Ahora)
 Qué: Terminar la lógica de game-core (acción de double, etc.) y la de bets-service (actualizar la apuesta con el resultado y, en el futuro, gestionar el pago). Básicamente, completar el "happy path" y los casos de error lógicos.
+EN MARCHA:
+
+
+
+-ampliar user para temas de pasta
 
 Por qué: Es la base de todo. No podemos proteger, empaquetar o desplegar una aplicación que no es funcionalmente completa. Es el momento de añadir valor de negocio directo.
 
@@ -28,5 +33,7 @@ Qué: Como bien dices, este es el momento de configurar APISIX. Lo configurarás
 Por qué: El Gateway depende de que el servicio de autenticación ya exista para poder validar los tokens. Es el portero que necesita que el sistema de llaves (auth) ya esté funcionando.
 
 
+DEUDA TÉCNICA
 
+Usar anotación @Mapper para las clases de mapeo y refactorizar lo necesario
 

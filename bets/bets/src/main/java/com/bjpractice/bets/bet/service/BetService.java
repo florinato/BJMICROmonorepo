@@ -6,6 +6,7 @@ import com.bjpractice.bets.bet.model.BetStatus;
 import com.bjpractice.bets.bet.repository.BetRepository;
 import com.bjpractice.bets.bet.BetDTO;
 import com.bjpractice.bets.bet.BetMapper;
+import com.bjpractice.bets.client.UserServiceClient;
 import com.bjpractice.bets.exception.InvalidBetAmountException;
 import com.bjpractice.bets.kafka.event.GameFinishedEvent;
 import com.bjpractice.bets.kafka.listener.GameEventListener;
@@ -24,11 +25,13 @@ public class BetService {
 
     private final BetRepository betRepository;
     private final BetMapper betMapper;
+    private final UserServiceClient userServiceClient;
     private static final Logger log = LoggerFactory.getLogger(BetService.class);
 
-    public BetService(BetRepository betRepository, BetMapper betMapper) {
+    public BetService(BetRepository betRepository, BetMapper betMapper, UserServiceClient userServiceClient) {
         this.betRepository = betRepository;
         this.betMapper = betMapper;
+        this.userServiceClient = userServiceClient;
     }
 
 
@@ -74,7 +77,6 @@ public class BetService {
                         bet.getUserId(), totalReturned, bet.getAmount(), payout);
 
 
-
             }
             case "DEALER_WINS" -> bet.setStatus(BetStatus.LOST);
             case "PUSH" -> {
@@ -90,11 +92,11 @@ public class BetService {
 
         if (totalReturned.compareTo(BigDecimal.ZERO) > 0) {
             log.info("PAYOUT/RETURN para userId {}: Devolviendo un total de {}", bet.getUserId(), totalReturned);
-            // TODO: Llamada a user-service para acreditar 'totalReturned' al usuario.
+            userServiceClient.creditUser(bet.getUserId(), totalReturned);
+
+        }
+
 
     }
-
-
-}
 
 }
