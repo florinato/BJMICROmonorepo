@@ -197,7 +197,7 @@ class BetServiceTest {
         BetEntity savedBet = betRepository.save(originalBet);
         UUID betId = savedBet.getId();
 
-        // Create the event for a dealer win
+
         GameFinishedEvent dealerWinEvent = new GameFinishedEvent(
                 UUID.randomUUID(), betId, 1L, "DEALER_WINS", false
         );
@@ -228,19 +228,19 @@ class BetServiceTest {
         BetEntity savedBet = betRepository.save(originalBet);
         UUID betId = savedBet.getId();
 
-        // Creamos el evento para un empate (push)
+
         GameFinishedEvent pushEvent = new GameFinishedEvent(
                 UUID.randomUUID(), betId, 1L, "PUSH", false
         );
 
-        // En un push, se devuelve la apuesta original
+
         BigDecimal expectedCredit = new BigDecimal("10.00");
 
         // --- Act ---
         betService.processGameResult(pushEvent);
 
         // --- Assert ---
-        // 1. Verificamos que el estado es PUSH
+
         BetEntity updatedBet = betRepository.findById(betId).get();
         assertEquals(BetStatus.PUSH, updatedBet.getStatus());
 

@@ -1,39 +1,52 @@
 
+# THE ROADMAP (FINAL PHASE)
 
-THE ROADMAP (FINAL PHASE)
+### Fase 1: Lógica de Negocio Central ✅
+* **Estado:** **COMPLETADA**
+* **Logros:**
+    * Se ha finalizado la lógica principal de `game-core`, incluyendo las acciones de `startGame`, `playerHit`, `playerStand` y `playerDoubleDown`.
+    * Se ha implementado la lógica en `bets-service` para procesar los resultados del juego (`PLAYER_WINS`, `DEALER_WINS`, `PUSH`) y calcular los pagos correspondientes, incluyendo el pago especial por Blackjack.
+    * Se ha establecido la comunicación asíncrona vía Kafka entre ambos servicios.
 
-Fase 1: Solidificar la Lógica de Negocio Central (Ahora)
-Qué: Terminar la lógica de game-core (acción de double, etc.) y la de bets-service (actualizar la apuesta con el resultado y, en el futuro, gestionar el pago). Básicamente, completar el "happy path" y los casos de error lógicos.
-EN MARCHA:
+### Fase 2: Tests de Integración Automatizados (Testcontainers) ✅
+* **Estado:** **COMPLETADA**
+* **Logros:**
+    * Se ha configurado Testcontainers para levantar un broker de Kafka real durante la ejecución de los tests.
+    * Se ha creado un test de integración (`GameCoreServiceTCIntegrationTest`) que verifica la publicación de eventos a un broker de Kafka real.
 
+### Fase 3: Containerización (Docker)
+* **Estado:** PENDIENTE
+* **Descripción:** Crear un `Dockerfile` para cada microservicio y un fichero `docker-compose.yml` para orquestar toda la pila de la aplicación (MySQL, Kafka, y los servicios).
 
+### Fase 4: Implementar la Capa de Usuario y Seguridad
+* **Estado:** PENDIENTE
+* **Descripción:**
+    * **`user-service`:** Desarrollar el servicio para gestionar los datos de los usuarios y su saldo (`balance`).
+    * **`auth-service`:** Implementar la lógica para el registro, login y emisión de tokens (JWT).
 
--ampliar user para temas de pasta
+### Fase 5: Integrar el API Gateway (APISIX)
+* **Estado:** PENDIENTE
+* **Descripción:** Configurar APISIX como la única puerta de entrada al sistema, validando tokens y enriqueciendo las peticiones.
 
-Por qué: Es la base de todo. No podemos proteger, empaquetar o desplegar una aplicación que no es funcionalmente completa. Es el momento de añadir valor de negocio directo.
+---
+### Deuda Técnica y Mejoras Pendientes
 
-Fase 2: Tests de Integración Automatizados (Testcontainers)
-Qué: Ahora que la comunicación Kafka funciona (probada manualmente), es el momento de automatizar esa "prueba de fuego". Usaremos Testcontainers para levantar un broker de Kafka real durante la ejecución de los tests de Maven. Esto nos permitirá tener un test que arranque ambos servicios y verifique la comunicación sin necesidad de Postman ni de tener Kafka instalado.
+* **Refactorizar Mappers con MapStruct:**
+    * **Tarea:** Sustituir las implementaciones manuales por interfaces de MapStruct.
+    * **Beneficio:** Reducir código repetitivo y aumentar la seguridad en tiempo de compilación.
 
-Por qué: Esto crea una red de seguridad robusta y automática. Garantiza que futuros cambios no rompan la comunicación entre servicios y es esencial para cualquier sistema de Integración Continua (CI/CD).
+* **Implementar Perfiles de Spring para Configuración:**
+    * **Tarea:** Crear ficheros `application-dev.yml` y `application-prod.yml`.
+    * **Beneficio:** Separación limpia de la configuración por entorno y despliegues robustos.
 
-Fase 3: Containerización (Docker)
-Qué: Crear un Dockerfile para cada uno de tus microservicios (game-core, bets-service, etc.). Luego, crear un fichero docker-compose.yml que defina y orqueste toda la pila de la aplicación (la base de datos MySQL, Kafka, y tus servicios).
+* **Implementar Patrón Transactional Outbox:**
+    * **Tarea:** Asegurar la entrega de eventos de Kafka.
+    * **Beneficio:** Aumenta la resiliencia y la fiabilidad del sistema.
 
-Por qué: Docker te permite empaquetar tus aplicaciones y sus dependencias, asegurando que funcionan igual en tu máquina, en la de otro desarrollador o en producción. Docker Compose es la herramienta perfecta para levantar todo tu entorno local con un solo comando.
+* **Añadir Documentación de API (Swagger/OpenAPI):**
+    * **Tarea:** Integrar Swagger en los controladores.
+    * **Beneficio:** Facilita el uso y la prueba de la API.
 
-Fase 4: Implementar la Capa de Seguridad (auth-service y user-service)
-Qué: Dar vida a user-service para gestionar los datos de los usuarios y a auth-service para gestionar el login y la emisión de tokens (ej. JWT).
-
-Por qué: La seguridad es una capa fundamental que se construye sobre una aplicación funcional. No puedes asegurar algo que todavía no existe o no funciona.
-
-Fase 5: Integrar el API Gateway (APISIX)
-Qué: Como bien dices, este es el momento de configurar APISIX. Lo configurarás para que sea la única puerta de entrada. Su principal trabajo será interceptar las peticiones, validar el token JWT que le envíe el cliente, y si es válido, inyectar la cabecera X-User-ID antes de pasar la petición al microservicio correspondiente.
-
-Por qué: El Gateway depende de que el servicio de autenticación ya exista para poder validar los tokens. Es el portero que necesita que el sistema de llaves (auth) ya esté funcionando.
-
-
-DEUDA TÉCNICA
-
-Usar anotación @Mapper para las clases de mapeo y refactorizar lo necesario
-
+* **Gestionar Vulnerabilidades de Dependencias:**
+    * **Tarea:** Utilizar herramientas como Snyk o el plugin de OWASP.
+    * **Beneficio:** Mejora la seguridad general de la aplicación.

@@ -24,7 +24,7 @@ spring:
   # --- Kafka config (Producer) ---
   kafka:
     producer:
-      bootstrap-servers: localhost:9092
+#      bootstrap-servers: localhost:9092 OJO CUIDAO
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       # El bloque "properties" que causaba el error ha sido eliminado.

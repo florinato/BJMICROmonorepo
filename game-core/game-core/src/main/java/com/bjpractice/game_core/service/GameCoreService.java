@@ -5,6 +5,7 @@ import com.bjpractice.game_core.dto.GameDTO;
 import com.bjpractice.game_core.exception.BetAlreadyInGameException;
 import com.bjpractice.game_core.exception.GameNotFoundException;
 import com.bjpractice.game_core.kafka.event.GameFinishedEvent;
+import com.bjpractice.game_core.kafka.event.PlayerDoubleEvent;
 import com.bjpractice.game_core.kafka.producer.GameEventProducer;
 import com.bjpractice.game_core.mapper.GameMapper;
 import com.bjpractice.game_core.model.Game;
@@ -120,6 +121,43 @@ public class GameCoreService {
 
 
         return gameMapper.toDTO(gameEntity);
+    }
+
+    // DOUBLE
+
+    public GameDTO playerDouble(UUID gameId) {
+
+        GameEntity gameEntity = gameRepository.findById(gameId)
+                .orElseThrow(() -> new GameNotFoundException("Partida no encontrada con id " + gameId));
+
+        Game game = gameEntity.getGameLogic();
+
+        game.playerDouble();
+
+        PlayerDoubleEvent doubleEvent = new PlayerDoubleEvent(
+                gameEntity.getId(),
+                gameEntity.getBetId(),
+                gameEntity.getUserId()
+
+        );
+        gameEventProducer.sendPlayerDoubledEvent(doubleEvent);
+
+        gameRepository.save(gameEntity);
+
+
+        if (game.isGameOver()) {
+            GameFinishedEvent finishedEvent = new GameFinishedEvent(
+                    gameEntity.getId(),
+                    gameEntity.getBetId(),
+                    gameEntity.getUserId(),
+                    game.getResult(),
+                    game.getPlayer().hasBlackjack()
+            );
+            gameEventProducer.sendGameFinishedEvent(finishedEvent);
+        }
+
+        return gameMapper.toDTO(gameEntity);
+
     }
 
 

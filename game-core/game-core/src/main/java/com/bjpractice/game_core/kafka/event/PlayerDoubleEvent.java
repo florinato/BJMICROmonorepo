@@ -13,7 +13,7 @@ import java.util.UUID;
 public class PlayerDoubleEvent {
 
     private UUID gameId;
-
+    private UUID betId;
     private Long userId;
 
 

@@ -24,7 +24,6 @@ public class BetController {
             @RequestBody CreateBetRequest request)
 
     {
-
         BetDTO newBet = betService.placeBet(userId, request.amount());
         return ResponseEntity.status(HttpStatus.CREATED).body(newBet);
     }

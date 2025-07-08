@@ -39,4 +39,10 @@ public class GameController {
         GameDTO updatedGame = gameCoreService.playerHit(gameId);
         return ResponseEntity.ok(updatedGame);
     }
+
+    @PostMapping("/{gameId}/double")
+    public ResponseEntity<GameDTO> doubleDown(@PathVariable UUID gameId) {
+        GameDTO updatedGame = gameCoreService.playerDouble(gameId);
+        return ResponseEntity.ok(updatedGame);
+    }
 }

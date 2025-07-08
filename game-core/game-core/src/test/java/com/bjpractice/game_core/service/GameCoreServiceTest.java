@@ -4,6 +4,7 @@ package com.bjpractice.game_core.service;
 import com.bjpractice.game_core.config.TestKafkaConfiguration;
 import com.bjpractice.game_core.dto.GameDTO;
 import com.bjpractice.game_core.kafka.event.GameFinishedEvent;
+import com.bjpractice.game_core.kafka.event.PlayerDoubleEvent;
 import com.bjpractice.game_core.kafka.producer.GameEventProducer;
 import com.bjpractice.game_core.model.Card;
 import com.bjpractice.game_core.model.Game;
@@ -11,6 +12,7 @@ import com.bjpractice.game_core.model.GameEntity;
 import com.bjpractice.game_core.model.GameEntityTestBuilder;
 import com.bjpractice.game_core.repository.GameRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -206,6 +208,44 @@ class GameCoreServiceTest {
         ArgumentCaptor<GameFinishedEvent> eventCaptor = ArgumentCaptor.forClass(GameFinishedEvent.class);
         verify(gameEventProducer, Mockito.times(1)).sendGameFinishedEvent(eventCaptor.capture());
         assertEquals(Game.GameResult.DEALER_WINS, eventCaptor.getValue().getResult());
+    }
+
+
+
+    @Test
+    @DisplayName("When player doubles down, should deal one card, end game, and send two events")
+    void playerDoubleDown_whenAllowed_shouldEndGameAndNotify() {
+        // --- Arrange ---
+        Long userId = 1L;
+        UUID betId = UUID.randomUUID();
+
+        // Gracias builder prayge
+        GameEntity gameEntity = GameEntityTestBuilder.createGameInPlayerTurn(userId, betId);
+        gameRepository.save(gameEntity);
+        UUID gameId = gameEntity.getId();
+
+        int initialPlayerHandSize = gameEntity.getGameLogic().getPlayer().getHand().size();
+
+        // --- Act ---
+        GameDTO resultDTO = gameCoreService.playerDouble(gameId);
+
+        // --- Assert ---
+
+        assertEquals(initialPlayerHandSize + 1, resultDTO.getPlayerHand().size(), "El jugador debe tener una carta más");
+        assertEquals(Game.GameState.GAME_OVER, resultDTO.getGameState(), "El juego debería haber terminado");
+
+        // Verificamos que se enviaron AMBOS eventos a Kafka
+        ArgumentCaptor<PlayerDoubleEvent> doubleEventCaptor = ArgumentCaptor.forClass(PlayerDoubleEvent.class);
+        ArgumentCaptor<GameFinishedEvent> finishedEventCaptor = ArgumentCaptor.forClass(GameFinishedEvent.class);
+
+        // Verificamos que se llamó una vez a cada método del producer
+        verify(gameEventProducer, Mockito.times(1)).sendPlayerDoubledEvent(doubleEventCaptor.capture());
+        verify(gameEventProducer, Mockito.times(1)).sendGameFinishedEvent(finishedEventCaptor.capture());
+
+        // Verificamos el contenido de los eventos capturados
+        assertEquals(betId, doubleEventCaptor.getValue().getBetId(), "El betId del PlayerDoubleEvent es incorrecto");
+        assertEquals(betId, finishedEventCaptor.getValue().getBetId(), "El betId del GameFinishedEvent es incorrecto");
+        assertNotNull(finishedEventCaptor.getValue().getResult(), "El resultado del juego no puede ser nulo");
     }
 
 

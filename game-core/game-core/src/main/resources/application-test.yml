@@ -1,0 +1,26 @@
+kafka:
+  topic:
+    games: "games-topic"
+
+
+
+
+## En: src/test/resources/application-test.yml
+
+
+#
+## Configuración para que los tests usen una base de datos H2 en memoria
+#spring:
+#  datasource:
+#    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
+#  jpa:
+#    hibernate:
+#      ddl-auto: create-drop # Crea el schema al empezar y lo borra al terminar
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.H2Dialect
+#
+## Nota: No hay ninguna configuración de Kafka aquí.
