@@ -1,0 +1,96 @@
+
+services:
+  # --- Base de Datos ---
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-bjmicros
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=game_core_db
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  # --- Infraestructura de Kafka (Modo KRaft) ---
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka-bjmicros
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
+      KAFKA_CLUSTER_ID: '3isREI5fQEO4Y_8zMykj_A' # <-- Tu Cluster ID
+
+  # --- Nuestros Microservicios ---
+  game-core-app:
+    container_name: game-core-app
+    build:
+      context: ./game-core/game-core
+    ports:
+      - "8081:8081"
+    environment:
+      # Sobrescribimos la URL de la BBDD para que apunte al contenedor 'mysql-db'
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/game_core_db?serverTimezone=UTC
+      # Sobrescribimos la URL de Kafka para que apunte al contenedor 'kafka'
+      - SPRING_KAFKA_PRODUCER_BOOTSTRAP-SERVERS=kafka:9092
+      # (Opcional pero buena práctica) Le decimos qué perfil está activo
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - mysql-db
+      - kafka
+
+  bets-service-app:
+    container_name: bets-service-app
+    build:
+      context: ./bets/bets
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/bets_db?serverTimezone=UTC
+      - SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS=kafka:9092
+    depends_on:
+      - mysql-db
+      - kafka
+
+  user-service-app:
+    container_name: user-service-app
+    build:
+      context: ./user/user
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/user_db?serverTimezone=UTC
+    depends_on:
+      - mysql-db
+
+  auth-service-app:
+    container_name: auth-service-app
+    build:
+      context: ./auth/auth
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/auth_db?serverTimezone=UTC
+    depends_on:
+      - mysql-db
+
+  # --- API Gateway (Modo Stand-Alone) ---
+  apisix:
+    image: apache/apisix:3.9.1-debian
+    container_name: apisix-bjmicros
+    volumes:
+      # Montamos nuestros ficheros de configuración locales sobre los del contenedor
+      - ./apisix_config/config.yaml:/usr/local/apisix/conf/config.yaml
+      - ./apisix_config/apisix.yaml:/usr/local/apisix/conf/apisix.yaml
+    ports:
+      - "9180:9180" # Admin API
+      - "9080:9080" # Proxy
+
+volumes:
+  mysql-data:

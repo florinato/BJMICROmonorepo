@@ -1,0 +1,7 @@
+apisix:
+  deployment:
+    role: data_plane
+    role_data_plane:
+      config_provider: yaml
+
+# Este config sería el de etcd, estando así le decimos al APISIX que esto es stanladone y que busque la config en el apisix.yaml

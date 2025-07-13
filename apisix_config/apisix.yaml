@@ -1,0 +1,9 @@
+# Por ahora puede estar casi vacío, solo con la estructura inicial.
+# Ejemplo de cómo añadirías una ruta en el futuro:
+# routes:
+#   - id: 1
+#     uri: /api/bets
+#     upstream:
+#       type: roundrobin
+#       nodes:
+#         "bets-service-app:8082": 1

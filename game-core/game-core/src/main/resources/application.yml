@@ -1,35 +1,8 @@
-server:
-  port: 8081
-
 spring:
   application:
     name: game-core
 
-  # --- Configuración de la Base de Datos (DataSource) ---
-  datasource:
-    url: jdbc:mysql://localhost:3306/game_core_db?serverTimezone=UTC
-    username: root
-    password: root
-
-  # --- Configuración de JPA / Hibernate ---
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
-
-  # --- Kafka config (Producer) ---
-  kafka:
-    producer:
-#      bootstrap-servers: localhost:9092 OJO CUIDAO
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      # El bloque "properties" que causaba el error ha sido eliminado.
-
-# --- Propiedades personalizadas de la aplicación ---
+# Propiedades personalizadas de la aplicación (comunes a todos los entornos)
 kafka:
   topic:
     games: "games-topic"

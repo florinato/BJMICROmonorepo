@@ -10,4 +10,6 @@ public class BetsApplication {
 		SpringApplication.run(BetsApplication.class, args);
 	}
 
+
+	// AHORA NO ARRANCA POR QUE FALTA EL PRODUCTOR DE KAFKA PARA ENVIAR A USER EL RESULTADO DE LA PARTIDA
 }

@@ -17,11 +17,13 @@
 ### Fase 3: Containerización (Docker)
 * **Estado:** PENDIENTE
 * **Descripción:** Crear un `Dockerfile` para cada microservicio y un fichero `docker-compose.yml` para orquestar toda la pila de la aplicación (MySQL, Kafka, y los servicios).
+* MIRAR POR QUÉ EL CONTENEDOR DE USER Y DE BETS SE DETIENEN
 
 ### Fase 4: Implementar la Capa de Usuario y Seguridad
 * **Estado:** PENDIENTE
 * **Descripción:**
     * **`user-service`:** Desarrollar el servicio para gestionar los datos de los usuarios y su saldo (`balance`).
+    * Y TENER EN CUENTA EL PRODUCTOR DE BETS PARA CUANOD ACABA LA PARTDA ENVIARLO A USER
     * **`auth-service`:** Implementar la lógica para el registro, login y emisión de tokens (JWT).
 
 ### Fase 5: Integrar el API Gateway (APISIX)
