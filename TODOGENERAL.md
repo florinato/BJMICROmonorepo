@@ -17,7 +17,7 @@
 ### Fase 3: Containerización (Docker)
 * **Estado:** PENDIENTE
 * **Descripción:** Crear un `Dockerfile` para cada microservicio y un fichero `docker-compose.yml` para orquestar toda la pila de la aplicación (MySQL, Kafka, y los servicios).
-* MIRAR POR QUÉ EL CONTENEDOR DE USER Y DE BETS SE DETIENEN
+* MIRAR POR QUÉ EL CONTENEDOR DE USER Y DE BETS SE DETIENEN (Por que falta implementar el evento de kafka que va de bets a user)
 
 ### Fase 4: Implementar la Capa de Usuario y Seguridad
 * **Estado:** PENDIENTE
@@ -52,3 +52,5 @@
 * **Gestionar Vulnerabilidades de Dependencias:**
     * **Tarea:** Utilizar herramientas como Snyk o el plugin de OWASP.
     * **Beneficio:** Mejora la seguridad general de la aplicación.
+  
+* **Refactorizar clases immutables a records**
