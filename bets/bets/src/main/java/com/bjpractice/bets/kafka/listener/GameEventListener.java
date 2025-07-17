@@ -4,15 +4,17 @@ package com.bjpractice.bets.kafka.listener;
 import com.bjpractice.bets.bet.service.BetService;
 import com.bjpractice.bets.kafka.event.GameFinishedEvent;
 import com.bjpractice.bets.kafka.event.PlayerDoubleEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class GameEventListener {
 
-    private static final Logger log = LoggerFactory.getLogger(GameEventListener.class);
+
     private final BetService betService;
 
     public GameEventListener(BetService betService) {
@@ -20,9 +22,9 @@ public class GameEventListener {
     }
 
     @KafkaListener(
-    topics = "${kafka.topic.games}",
-    groupId = "bets-service-group"
-            )
+            topics = "${kafka.topic.games}",
+            groupId = "bets-service-group"
+    )
     public void handleGameFinishedEvent(GameFinishedEvent event){
 
         log.info("SUCCESS: Received GameFinishedEvent for betId:  {}", event.betId());

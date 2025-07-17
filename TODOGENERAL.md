@@ -54,3 +54,5 @@
     * **Beneficio:** Mejora la seguridad general de la aplicación.
   
 * **Refactorizar clases immutables a records**
+
+* **Refactorizar user id's de Long a UUID 💀**

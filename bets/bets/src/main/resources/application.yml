@@ -3,11 +3,9 @@ server:
 
 spring:
   application:
-
     name: bets
 
   datasource:
-
     url: jdbc:mysql://localhost:3306/bets_db?serverTimezone=UTC
     username: root
     password: root
@@ -15,53 +13,35 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
 
-# ===============================================
-# KAFKA CONFIGURATION (PRELIMINAR!!)
-# ===============================================
-
+  # --- CONFIGURACIÓN DE KAFKA ---
   kafka:
-    # --- CONFIGURACIÓN DEL CONSUMIDOR (PARA ESCUCHAR EVENTOS) ---
+    # --- Configuración del Consumidor  ---
     consumer:
       bootstrap-servers: localhost:9092
-      group-id: bets-service-group
+      group-id: ${spring.application.name}
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: "*"
-        spring.json.value.default.type: com.bjpractice.bets.kafka.event.GameFinishedEvent
+        spring.json.trusted.packages: "com.bjpractice.bets.kafka.event"
         spring.json.use.type.headers: false
 
-    # --- CONFIGURACIÓN DEL PRODUCTOR (PARA ENVIAR EVENTOS) ---
+        spring.json.value.default.type: com.bjpractice.bets.kafka.event.GameFinishedEvent
+
+    # --- Configuración del Productor  ---
     producer:
       bootstrap-servers: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      # No necesitamos la propiedad 'default.type' aquí.
-      # Si quisiéramos añadir propiedades al productor, seguirían la misma estructura con un bloque 'properties:'.
 
-# --- DEFINICIÓN DE NOMBRES DE TOPICS ---
-kafka:
-  topic:
-    games: "games-topic" # Topic del que se leen los resultados de los juegos
-    bets: "bets-topic"
-
-# --- Placeholder para Service Discovery (futura integración con ApiSix/Gateway) ---
-# eureka:
-#   client:
-#     serviceUrl:
-#       defaultZone: http://localhost:8761/eureka/
-#   instance:
-#     prefer-ip-address: true
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health"
+# --- Propiedades personalizadas de la aplicación (incluyendo topics) ---
+app:
+  kafka:
+    topics:
+      game-finished: "games.game-finished" # Topic del que se leen los resultados
+      bet-settled: "bets.bet-settled"

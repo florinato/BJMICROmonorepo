@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.net.UnknownServiceException;
 
 @Service
@@ -22,12 +23,12 @@ public class UserService {
     }
 
     @Transactional
-    public User registerUser(String email, String username, String password){
+    public User registerUser(String email, String username, String password) {
 
-        if(userRepository.existsByEmail(email)){
+        if (userRepository.existsByEmail(email)) {
             throw new UserAlreadyExistsException("El nombre de usuario '" + username + "' ya está en uso.");
         }
-        if(userRepository.existsByUsername(username)){
+        if (userRepository.existsByUsername(username)) {
             throw new UserAlreadyExistsException("El email '" + email + "' ya está registrado.");
         }
 
@@ -42,7 +43,18 @@ public class UserService {
 
         return userRepository.save(newUser);
 
+    }
 
+    @Transactional
+    public User updateBalance(Long userId, BigDecimal amountToAdd) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrao"));
+
+        BigDecimal newBalance = user.getBalance().add(amountToAdd);
+        user.setBalance(newBalance);
+
+        return userRepository.save(user);
 
     }
 
