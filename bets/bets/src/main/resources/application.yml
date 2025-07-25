@@ -28,10 +28,10 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: "com.bjpractice.bets.kafka.event"
+        spring.json.trusted.packages: "com.bjpractice.events"
         spring.json.use.type.headers: false
 
-        spring.json.value.default.type: com.bjpractice.bets.kafka.event.GameFinishedEvent
+        spring.json.value.default.type: com.bjpractice.events.GameFinishedEvent
 
     # --- Configuración del Productor  ---
     producer:

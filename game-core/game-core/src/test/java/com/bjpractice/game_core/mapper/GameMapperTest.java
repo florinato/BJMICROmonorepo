@@ -28,12 +28,12 @@ class GameMapperTest {
     void toDTO_whenGameIsInProgress_thenDealerHandIsMasked() {
 
         // 1. Arrange:
-
         Long userId = 123L;
         UUID betId = UUID.randomUUID();
 
-        Card dealerCard1_visible = new Card(Card.Suit.CLUBS, Card.Rank.SEVEN);
-        Card dealerCard2_hidden = new Card(Card.Suit.SPADES, Card.Rank.QUEEN);
+        // ✅ CORRECCIÓN: Nombramos las variables para que reflejen la lógica real del Blackjack
+        Card dealerCard1_hidden = new Card(Card.Suit.SPADES, Card.Rank.QUEEN);
+        Card dealerCard2_visible = new Card(Card.Suit.CLUBS, Card.Rank.SEVEN);
 
         GameEntity gameEntity = GameEntityTestBuilder.createGameInProgressWithSpecificCards(
                 userId,
@@ -42,25 +42,27 @@ class GameMapperTest {
                         new Card(Card.Suit.HEARTS, Card.Rank.TEN),
                         new Card(Card.Suit.SPADES, Card.Rank.FIVE)
                 ),
+                // El orden importa: la oculta primero, la visible después
                 List.of(
-                        dealerCard1_visible,
-                        dealerCard2_hidden
+                        dealerCard1_hidden,
+                        dealerCard2_visible
                 )
-
         );
 
+        // 2. Act
         GameDTO resultDTO = gameMapper.toDTO(gameEntity);
 
+        // 3. Assert
         assertThat(resultDTO).isNotNull();
-        assertThat(resultDTO.getDealerHand()).hasSize(1);
+        assertThat(resultDTO.getDealerHand()).hasSize(1); // Solo se debe ver una carta
 
+        // ✅ CORRECCIÓN: Verificamos que la carta visible es la SEGUNDA
         CardDTO visibleDealerCardDTO = resultDTO.getDealerHand().get(0);
-        assertThat(visibleDealerCardDTO.getRank()).isEqualTo(dealerCard1_visible.getRank().name());
-        assertThat(visibleDealerCardDTO.getSuit()).isEqualTo(dealerCard1_visible.getSuit().name());
+        assertThat(visibleDealerCardDTO.getRank()).isEqualTo(dealerCard2_visible.getRank().name());
+        assertThat(visibleDealerCardDTO.getSuit()).isEqualTo(dealerCard2_visible.getSuit().name());
 
-        assertThat(resultDTO.getDealerScore()).isEqualTo(dealerCard1_visible.getValue());
-
-
+        // Verificamos que la puntuación visible es la de la SEGUNDA carta
+        assertThat(resultDTO.getDealerScore()).isEqualTo(dealerCard2_visible.getValue());
     }
 
 

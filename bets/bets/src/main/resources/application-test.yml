@@ -1,0 +1,15 @@
+# Propiedades para los topics de Kafka
+kafka:
+  topic:
+    games: "games-topic"
+app:
+  kafka:
+    topics:
+      game-finished: "games-topic-test"
+      bet-settled: "bets.bet-settled-test"
+
+# Configuración del serializador para el productor de Kafka
+spring:
+  kafka:
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

@@ -27,7 +27,11 @@ kafka:
     key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
     properties:
-      spring.json.trusted.packages: "com.bjpractice.user.event"
+      spring.json.trusted.packages: "com.bjpractice.events"
+      #1. Le decimos que NO espere cabeceras de tipo
+      spring.json.use.type.headers: false
+      # 2. Le decimos qué clase usar por defecto para los mensajes de este consumidor
+      spring.json.value.default.type: com.bjpractice.events.BetSettledEvent
 
 # --- Placeholder para Service Discovery (futura integracion con ApiSix/Gateway) ---
 # eureka:

@@ -1,4 +1,4 @@
-package com.bjpractice.game_core.config;
+package com.bjpractice.user.config;
 
 
 import org.apache.kafka.clients.admin.NewTopic;
@@ -10,15 +10,16 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaTopicConfig {
 
-    @Value("${app.kafka.topics.game-finished}")
-    private String gamesTopic;
+    @Value("${app.kafka.topics.bet-settled}")
+    private String betSettledTopic;
 
     @Bean
-    public NewTopic gamesTopic() {
-
-        return TopicBuilder.name(gamesTopic)
-                .partitions(6)
+    public NewTopic betSettledTopicBean() {
+        return TopicBuilder.name(betSettledTopic)
+                .partitions(1)
                 .replicas(1)
                 .build();
     }
+
+
 }

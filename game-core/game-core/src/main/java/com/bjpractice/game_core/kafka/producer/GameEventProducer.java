@@ -1,7 +1,7 @@
 package com.bjpractice.game_core.kafka.producer;
 
+import com.bjpractice.events.GameFinishedEvent;
 import com.bjpractice.game_core.kafka.event.PlayerDoubleEvent;
-import com.bjpractice.game_core.kafka.event.GameFinishedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,12 +21,12 @@ public class GameEventProducer {
 
     public void sendGameFinishedEvent(GameFinishedEvent event){
 
-        log.info("Sending GameFinishedEvent for game id: {}", event.getGameId());
+        log.info("Sending GameFinishedEvent for game id: {}", event.gameId());
         try {
             kafkaTemplate.send(gamesTopic, event);
         } catch (Exception e){
 
-            log.error("Error al enviar GameFinishedEvent para gameId: {}", event.getGameId(), e);
+            log.error("Error al enviar GameFinishedEvent para gameId: {}", event.gameId(), e);
             // Aquí se podría implementar una lógica de reintento o de persistencia
             // del evento para no perderlo en caso de que Kafka esté caído.
 

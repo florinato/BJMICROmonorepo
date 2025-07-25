@@ -4,10 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.5</version> <relativePath/> </parent>
+
     <groupId>com.bjpractice</groupId>
     <artifactId>bjmicros-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
-    
     <packaging>pom</packaging>
 
     <name>BJMICROS Parent</name>
@@ -17,6 +21,30 @@
         <module>game-core/game-core</module>
         <module>bets/bets</module>
         <module>user/user</module>
-        <module>auth/auth</module> </modules>
+        <module>auth/auth</module>
+        <module>common-events</module>
+    </modules>
+
+    <properties>
+
+        <java.version>17</java.version>
+        <testcontainers.version>1.19.8</testcontainers.version>
+    </properties>
+
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
 
 </project>

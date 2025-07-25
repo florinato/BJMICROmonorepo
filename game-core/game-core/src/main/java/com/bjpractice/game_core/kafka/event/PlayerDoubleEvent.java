@@ -16,5 +16,4 @@ public class PlayerDoubleEvent {
     private UUID betId;
     private Long userId;
 
-
 }

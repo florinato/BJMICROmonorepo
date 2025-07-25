@@ -49,26 +49,27 @@ public class GameMapper {
 
             // Si el juego está en curso, solo mostramos la segunda carta del dealer
         } else {
-
             List<CardDTO> visibleDealerHand = new ArrayList<>();
 
-            if (game.getDealer().getHand().size() > 0) {
-                visibleDealerHand.add(toCardDTO(game.getDealer().getHand().get(0)));
+            if (game.getDealer().getHand().size() > 1) {
+                Card visibleCard = game.getDealer().getHand().get(1);
+                visibleDealerHand.add(toCardDTO(visibleCard));
+                dto.setDealerScore(visibleCard.getValue());
             }
+
             dto.setDealerHand(visibleDealerHand);
 
-            // No mostramos la puntuación real del dealer hasta el final
-            dto.setDealerScore(game.getDealer().getHand().get(0).getValue());
+
         }
 
         return dto;
     }
 
 
-
     public List<CardDTO> toCardDTOList(List<Card> cards) {
 
         return cards.stream().map(this::toCardDTO).toList();
+
     }
 
     public CardDTO toCardDTO(Card card) {
@@ -77,7 +78,5 @@ public class GameMapper {
 
     }
 
-
-
-    }
+}
 

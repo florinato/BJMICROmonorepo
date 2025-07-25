@@ -6,8 +6,8 @@ import com.bjpractice.bets.bet.model.BetStatus;
 import com.bjpractice.bets.bet.repository.BetRepository;
 import com.bjpractice.bets.client.UserServiceClient;
 import com.bjpractice.bets.config.TestUserClientConfiguration;
-import com.bjpractice.bets.kafka.event.GameFinishedEvent;
 import com.bjpractice.bets.kafka.event.PlayerDoubleEvent;
+import com.bjpractice.events.GameFinishedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 import com.bjpractice.bets.kafka.listener.GameEventListener;
 
 import java.math.BigDecimal;

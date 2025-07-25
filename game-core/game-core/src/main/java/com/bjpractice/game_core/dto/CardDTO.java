@@ -14,3 +14,8 @@ public class CardDTO {
     private String suit;
 
 }
+
+//public record CardDTO(
+//        String rank,
+//        String suit
+//){}

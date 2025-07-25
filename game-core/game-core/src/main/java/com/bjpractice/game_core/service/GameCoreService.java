@@ -1,10 +1,10 @@
 package com.bjpractice.game_core.service;
 
 
+import com.bjpractice.events.GameFinishedEvent;
 import com.bjpractice.game_core.dto.GameDTO;
 import com.bjpractice.game_core.exception.BetAlreadyInGameException;
 import com.bjpractice.game_core.exception.GameNotFoundException;
-import com.bjpractice.game_core.kafka.event.GameFinishedEvent;
 import com.bjpractice.game_core.kafka.event.PlayerDoubleEvent;
 import com.bjpractice.game_core.kafka.producer.GameEventProducer;
 import com.bjpractice.game_core.mapper.GameMapper;
@@ -51,7 +51,7 @@ public class GameCoreService {
                     gameEntity.getId(),
                     gameEntity.getBetId(),
                     gameEntity.getUserId(),
-                    game.getResult(),
+                    game.getResult().name(),
                     game.getPlayer().hasBlackjack()
             );
             gameEventProducer.sendGameFinishedEvent(event);
@@ -79,7 +79,7 @@ public class GameCoreService {
                     gameEntity.getId(),
                     gameEntity.getBetId(),
                     gameEntity.getUserId(),
-                    game.getResult(),
+                    game.getResult().name(),
                     game.getPlayer().hasBlackjack()
             );
             gameEventProducer.sendGameFinishedEvent(event);
@@ -113,7 +113,7 @@ public class GameCoreService {
                     gameEntity.getId(),
                     gameEntity.getBetId(),
                     gameEntity.getUserId(),
-                    game.getResult(),
+                    game.getResult().name(),
                     game.getPlayer().hasBlackjack()
             );
             gameEventProducer.sendGameFinishedEvent(event);
@@ -150,7 +150,7 @@ public class GameCoreService {
                     gameEntity.getId(),
                     gameEntity.getBetId(),
                     gameEntity.getUserId(),
-                    game.getResult(),
+                    game.getResult().name(),
                     game.getPlayer().hasBlackjack()
             );
             gameEventProducer.sendGameFinishedEvent(finishedEvent);

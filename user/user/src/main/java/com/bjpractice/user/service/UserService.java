@@ -4,7 +4,7 @@ package com.bjpractice.user.service;
 import com.bjpractice.user.entity.User;
 import com.bjpractice.user.exception.UserAlreadyExistsException;
 import com.bjpractice.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +22,8 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+
+    // Este metodo tiene un bug, arreglarlo.
     @Transactional
     public User registerUser(String email, String username, String password) {
 

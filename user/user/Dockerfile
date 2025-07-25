@@ -5,7 +5,7 @@ FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
 # Copiar el .jar (asumiendo el nombre estándar de Maven)
-COPY target/user-0.0.1-SNAPSHOT.jar app.jar
+COPY target/user-1.0-SNAPSHOT.jar app.jar
 
 # Exponer el puerto 8083 para user-service
 EXPOSE 8083

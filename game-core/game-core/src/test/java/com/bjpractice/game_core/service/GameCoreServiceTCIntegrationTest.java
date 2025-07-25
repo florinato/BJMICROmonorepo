@@ -1,34 +1,33 @@
 package com.bjpractice.game_core.service;
 
+import com.bjpractice.events.GameFinishedEvent;
 import com.bjpractice.game_core.integration.AbstractIntegrationTest;
-import com.bjpractice.game_core.kafka.event.GameFinishedEvent;
 import com.bjpractice.game_core.kafka.event.PlayerDoubleEvent;
 import com.bjpractice.game_core.model.Card;
 import com.bjpractice.game_core.model.Game;
 import com.bjpractice.game_core.model.GameEntity;
 import com.bjpractice.game_core.model.GameEntityTestBuilder;
 import com.bjpractice.game_core.repository.GameRepository;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
-import java.time.Duration;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@TestPropertySource(properties = "spring.jpa.hibernate.ddl-auto=create-drop")
 @ActiveProfiles("test")
-public class GameCoreServiceTCIntegrationTest extends AbstractIntegrationTest {
+class GameCoreServiceTCIntegrationTest extends AbstractIntegrationTest {
 
     @Value("${kafka.topic.games}")
     private String gamesTopic;
@@ -39,33 +38,8 @@ public class GameCoreServiceTCIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private GameRepository gameRepository;
 
-    /**
-     * Método de ayuda para consumir un único evento de un topic de Kafka.
-     * @param topic El topic del que se va a consumir.
-     * @param eventType La clase del evento esperado, para una deserialización correcta.
-     * @return El evento consumido.
-     * @param <T> El tipo genérico del evento.
-     */
-    private <T> T consumeSingleEvent(String topic, Class<T> eventType) {
-        Map<String, Object> consumerProps = new HashMap<>();
-        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_CONTAINER.getBootstrapServers());
-        consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "tc-test-group-" + UUID.randomUUID());
-        consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-        // Añadimos la configuración del tipo de evento esperado para que el deserializador funcione con genéricos
-        consumerProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, eventType);
-        consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        KafkaConsumer<String, T> consumer = new KafkaConsumer<>(consumerProps);
-        consumer.subscribe(Collections.singletonList(topic));
 
-        ConsumerRecords<String, T> records = consumer.poll(Duration.ofSeconds(10));
-        consumer.close();
-
-        assertEquals(1, records.count(), "Se esperaba recibir exactamente un evento");
-        return records.iterator().next().value();
-    }
 
     @Test
     @DisplayName("[TC] When player stands, should publish a real event to Kafka")
@@ -78,14 +52,17 @@ public class GameCoreServiceTCIntegrationTest extends AbstractIntegrationTest {
         gameCoreService.playerStand(gameEntity.getId());
 
         // --- Assert ---
+        // ✅ CORRECCIÓN:
+        // 1. Llamamos a consumeEvents esperando UN (1) evento.
+        ConsumerRecords<String, Object> records = consumeEvents(gamesTopic, 1);
 
-        // Aqui llamamod al helper method de arriba...
-        GameFinishedEvent receivedEvent = consumeSingleEvent(gamesTopic, GameFinishedEvent.class);
+        // 2. Sacamos el primer y único evento de la colección y lo convertimos al tipo correcto.
+        GameFinishedEvent receivedEvent = (GameFinishedEvent) records.iterator().next().value();
 
-
+        // 3. El resto de tus aserciones funcionan exactamente igual.
         assertNotNull(receivedEvent);
-        assertEquals(gameEntity.getBetId(), receivedEvent.getBetId());
-        assertEquals(gameEntity.getUserId(), receivedEvent.getUserId());
+        assertEquals(gameEntity.getBetId(), receivedEvent.betId());
+        assertEquals(gameEntity.getUserId(), receivedEvent.userId());
     }
 
 
@@ -108,12 +85,17 @@ public class GameCoreServiceTCIntegrationTest extends AbstractIntegrationTest {
         gameCoreService.playerHit(gameEntity.getId());
 
         // --- Assert ---
-        // Usamos nuestro helper. Esperamos un GameFinishedEvent con el resultado correcto.
-        GameFinishedEvent receivedEvent = consumeSingleEvent(gamesTopic, GameFinishedEvent.class);
+        // ✅ CORRECCIÓN: Usamos el nuevo helper robusto
+        // 1. Llamamos a consumeEvents esperando UN (1) evento.
+        ConsumerRecords<String, Object> records = consumeEvents(gamesTopic, 1);
 
+        // 2. Sacamos el evento de la colección y lo convertimos al tipo correcto.
+        GameFinishedEvent receivedEvent = (GameFinishedEvent) records.iterator().next().value();
+
+        // 3. Tus aserciones originales se quedan igual.
         assertNotNull(receivedEvent);
-        assertEquals(gameEntity.getBetId(), receivedEvent.getBetId());
-        assertEquals(Game.GameResult.DEALER_WINS, receivedEvent.getResult(), "El resultado debería ser DEALER_WINS porque el jugador se pasó");
+        assertEquals(gameEntity.getBetId(), receivedEvent.betId());
+        assertEquals(Game.GameResult.DEALER_WINS, receivedEvent.result(), "El resultado debería ser DEALER_WINS porque el jugador se pasó");
     }
 
 
@@ -126,7 +108,7 @@ public class GameCoreServiceTCIntegrationTest extends AbstractIntegrationTest {
 
         gameCoreService.playerDouble(gameEntity.getId());
 
-        // Usamos el segundo helper para construir dos eventos
+
         ConsumerRecords<String, Object> records = consumeEvents(gamesTopic, 2);
 
         PlayerDoubleEvent playerDoubleEvent = null;
@@ -144,7 +126,7 @@ public class GameCoreServiceTCIntegrationTest extends AbstractIntegrationTest {
         assertEquals(gameEntity.getBetId(), playerDoubleEvent.getBetId());
 
         assertNotNull(gameFinishedEvent, "Se esperaba un GameFinishedEvent");
-        assertEquals(gameEntity.getBetId(), gameFinishedEvent.getBetId());
+        assertEquals(gameEntity.getBetId(), gameFinishedEvent.betId());
 
     }
 }

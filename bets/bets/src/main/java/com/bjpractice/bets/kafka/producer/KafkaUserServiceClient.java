@@ -2,7 +2,7 @@ package com.bjpractice.bets.kafka.producer;
 
 
 import com.bjpractice.bets.client.UserServiceClient;
-import com.bjpractice.bets.kafka.event.BetSettledEvent;
+import com.bjpractice.events.BetSettledEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -26,12 +26,10 @@ public class KafkaUserServiceClient implements UserServiceClient {
     @Override
     public void creditUser(Long userId, BigDecimal amount) {
         log.info("Enviando BetSettledEvent para userId: {} con monto: {}", userId, amount);
-        try {
-            BetSettledEvent event = new BetSettledEvent(userId, amount);
-            kafkaTemplate.send(betSettledTopic, event);
-        } catch (Exception e) {
-            log.error("No se pudo enviar BetSettledEvent para userId: {}", userId, e);
-        }
+        BetSettledEvent event = new BetSettledEvent(userId, amount);
+
+
+        kafkaTemplate.send(betSettledTopic, event);
     }
 
 

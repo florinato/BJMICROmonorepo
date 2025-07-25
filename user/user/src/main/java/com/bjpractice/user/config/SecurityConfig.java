@@ -25,6 +25,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/users/register").permitAll()
+                        .requestMatchers("/actuator/health").permitAll() // Sin esto no se podrá usar el heatlcheck para acceder al Container en testing usando el healthcheck y demás
                         .anyRequest().authenticated()
                 );
 

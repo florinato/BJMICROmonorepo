@@ -1,6 +1,7 @@
 package com.bjpractice.game_core.model;
 
 
+import com.bjpractice.game_core.exception.DeckIsEmptyException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -126,14 +127,14 @@ class DeckTest {
     }
 
     @Test
-    void dealCard_ShouldThrowNoSuchElementExceptionWhenDeckIsEmpty() {
+    void dealCard_ShouldThrowDeckIsEmptyException() {
         // Vaciamos el mazo
         while (deck.cardsRemaining() > 0) {
             deck.dealCard();
         }
 
         // Verificamos que se lance la excepción correcta al intentar robar de un mazo vacío
-        assertThrows(NoSuchElementException.class, () -> deck.dealCard(),
+        assertThrows(DeckIsEmptyException.class, () -> deck.dealCard(),
                 "Should throw NoSuchElementException when trying to deal from an empty deck.");
     }
 
@@ -175,7 +176,7 @@ class DeckTest {
     }
 
     @Test
-    void dealCards_ShouldThrowNoSuchElementExceptionWhenNotEnoughCards() {
+    void dealCards_ShouldThrowDeckIsEmptyExceptionWhenNotEnoughCards() {
         for (int i = 0; i < 49; i++) {
             deck.dealCard();
         }
@@ -183,7 +184,7 @@ class DeckTest {
 
         int cardsToDeal = 5;
 
-        assertThrows(NoSuchElementException.class, () -> deck.dealCards(player, cardsToDeal),
+        assertThrows(DeckIsEmptyException.class, () -> deck.dealCards(player, cardsToDeal),
                 "Should throw NoSuchElementException when trying to deal more cards than available.");
 
         assertEquals(3, player.getHand().size(),

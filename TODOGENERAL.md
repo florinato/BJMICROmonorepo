@@ -1,6 +1,10 @@
 
 # THE ROADMAP (FINAL PHASE)
 
+### WE ARE IN MANTENIIENTO MODE, objetivo mvn clean install:
+
+* **Mirar todos los tests**
+
 ### Fase 1: Lógica de Negocio Central ✅
 * **Estado:** **COMPLETADA**
 * **Logros:**
@@ -22,8 +26,8 @@
 ### Fase 4: Implementar la Capa de Usuario y Seguridad
 * **Estado:** PENDIENTE
 * **Descripción:**
-    * **`user-service`:** Desarrollar el servicio para gestionar los datos de los usuarios y su saldo (`balance`).
-    * Y TENER EN CUENTA EL PRODUCTOR DE BETS PARA CUANOD ACABA LA PARTDA ENVIARLO A USER
+    * **`user-service`:** Desarrollar el servicio para gestionar los datos de los usuarios y su saldo (`balance`). **DONE**
+    * Y TENER EN CUENTA EL PRODUCTOR DE BETS PARA CUANOD ACABA LA PARTDA ENVIARLO A USER (DONE falta acabar el testing)
     * **`auth-service`:** Implementar la lógica para el registro, login y emisión de tokens (JWT).
 
 ### Fase 5: Integrar el API Gateway (APISIX)
@@ -37,7 +41,7 @@
     * **Tarea:** Sustituir las implementaciones manuales por interfaces de MapStruct.
     * **Beneficio:** Reducir código repetitivo y aumentar la seguridad en tiempo de compilación.
 
-* **Implementar Perfiles de Spring para Configuración:**
+* **Implementar Perfiles de Spring para Configuración:** **COMPLETAO**
     * **Tarea:** Crear ficheros `application-dev.yml` y `application-prod.yml`.
     * **Beneficio:** Separación limpia de la configuración por entorno y despliegues robustos.
 
@@ -56,3 +60,6 @@
 * **Refactorizar clases immutables a records**
 
 * **Refactorizar user id's de Long a UUID 💀**
+
+
+* **Sonar Qube de todo**

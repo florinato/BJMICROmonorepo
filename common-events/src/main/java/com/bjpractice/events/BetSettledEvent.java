@@ -1,8 +1,9 @@
-package com.bjpractice.user.kafka.event;
+package com.bjpractice.events;
 
 import java.math.BigDecimal;
 
-public record BetSettledEvent(
+
+public record BetSettledEvent (
         Long userId,
         BigDecimal amount
 ) {}
