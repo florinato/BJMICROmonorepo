@@ -11,6 +11,11 @@ services:
       - MYSQL_DATABASE=game_core_db
     volumes:
       - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # --- Infraestructura de Kafka (Modo KRaft) ---
   kafka:
@@ -18,14 +23,18 @@ services:
     container_name: kafka-bjmicros
     ports:
       - "9092:9092"
+      # Opcional: podemos exponer el 9093 si necesitas acceder desde fuera de Docker
+      # - "9093:9093"
     environment:
-      KAFKA_NODE_ID: 1
+      CLUSTER_ID: '0HyBJRfGTmeiNhglXrZE5Q'
       KAFKA_PROCESS_ROLES: 'broker,controller'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT'
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
+      KAFKA_LISTENERS: 'PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093'
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
-      KAFKA_CLUSTER_ID: '3isREI5fQEO4Y_8zMykj_A' # <-- Tu Cluster ID
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT'
+
 
   # --- Nuestros Microservicios ---
   game-core-app:
@@ -35,16 +44,17 @@ services:
     ports:
       - "8081:8081"
     environment:
-      # Sobrescribimos la URL de la BBDD para que apunte al contenedor 'mysql-db'
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/game_core_db?serverTimezone=UTC
-      # Sobrescribimos la URL de Kafka para que apunte al contenedor 'kafka'
-      - SPRING_KAFKA_PRODUCER_BOOTSTRAP-SERVERS=kafka:9092
-      # (Opcional pero buena práctica) Le decimos qué perfil está activo
       - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/game_core_db?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
-      - mysql-db
-      - kafka
-
+      mysql-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
   bets-service-app:
     container_name: bets-service-app
     build:
@@ -52,12 +62,17 @@ services:
     ports:
       - "8082:8082"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/bets_db?serverTimezone=UTC
-      - SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS=kafka:9092
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/bets_db?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
-      - mysql-db
-      - kafka
-
+      mysql-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
   user-service-app:
     container_name: user-service-app
     build:
@@ -65,9 +80,17 @@ services:
     ports:
       - "8083:8083"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/user_db?serverTimezone=UTC
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/user_db?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
-      - mysql-db
+      mysql-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
 
   auth-service-app:
     container_name: auth-service-app
@@ -76,9 +99,15 @@ services:
     ports:
       - "8084:8084"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/auth_db?serverTimezone=UTC
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/auth_db?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
     depends_on:
-      - mysql-db
+      mysql-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
 
   # --- API Gateway (Modo Stand-Alone) ---
   apisix:

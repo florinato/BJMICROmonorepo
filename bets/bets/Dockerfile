@@ -5,7 +5,7 @@ FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
 # Copiar el .jar (asegúrate de que el nombre es correcto)
-COPY target/bets-0.0.1-SNAPSHOT.jar app.jar
+COPY target/bets-1.0-SNAPSHOT.jar app.jar
 
 # Exponer el puerto 8082 para bets-service
 EXPOSE 8082

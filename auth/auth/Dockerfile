@@ -5,7 +5,7 @@ FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
 # Copiar el .jar (asumiendo el nombre estándar de Maven)
-COPY target/auth-0.0.1-SNAPSHOT.jar app.jar
+COPY target/auth-1.0-SNAPSHOT.jar app.jar
 
 # Exponer el puerto 8084 para auth-service
 EXPOSE 8084

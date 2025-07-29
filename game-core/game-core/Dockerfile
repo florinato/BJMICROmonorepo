@@ -6,7 +6,7 @@ FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
 # Paso 3: Copiar el .jar
-COPY target/game-core-0.0.1-SNAPSHOT.jar app.jar
+COPY target/game-core-1.0-SNAPSHOT.jar app.jar
 
 # Paso 4: Exponer el puerto
 EXPOSE 8081

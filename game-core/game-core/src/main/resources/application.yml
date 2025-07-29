@@ -2,8 +2,7 @@ spring:
   application:
     name: game-core
 
-# Propiedades personalizadas de la aplicación (comunes a todos los entornos)
-app:
-  kafka:
-    topics:
-      game-finished: "games.game-finished"
+
+kafka:
+  topic:
+    games: "games-topic"

@@ -43,5 +43,9 @@ spring:
 app:
   kafka:
     topics:
-      game-finished: "games.game-finished" # Topic del que se leen los resultados
+      game-finished: "games.game-finished"
       bet-settled: "bets.bet-settled"
+
+kafka:
+  topic:
+    games: "games-topic"

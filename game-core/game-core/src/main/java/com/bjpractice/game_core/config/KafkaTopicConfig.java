@@ -10,7 +10,7 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaTopicConfig {
 
-    @Value("${app.kafka.topics.game-finished}")
+    @Value("${kafka.topic.games}")
     private String gamesTopic;
 
     @Bean
