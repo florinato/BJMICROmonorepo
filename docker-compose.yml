@@ -1,6 +1,5 @@
-
 services:
-  # --- Base de Datos ---
+  # --- Base de Datos Unificada ---
   mysql-db:
     image: mysql:8.0
     container_name: mysql-bjmicros
@@ -17,14 +16,12 @@ services:
       timeout: 5s
       retries: 5
 
-  # --- Infraestructura de Kafka (Modo KRaft) ---
+  # --- Broker de Kafka para Desarrollo ---
   kafka:
     image: confluentinc/cp-kafka:latest
     container_name: kafka-bjmicros
     ports:
       - "9092:9092"
-      # Opcional: podemos exponer el 9093 si necesitas acceder desde fuera de Docker
-      # - "9093:9093"
     environment:
       CLUSTER_ID: '0HyBJRfGTmeiNhglXrZE5Q'
       KAFKA_PROCESS_ROLES: 'broker,controller'
@@ -34,7 +31,10 @@ services:
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT'
-
+      # --- Fix para entorno de un solo nodo ---
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
 
   # --- Nuestros Microservicios ---
   game-core-app:
@@ -42,19 +42,21 @@ services:
     build:
       context: ./game-core/game-core
     ports:
-      - "8081:8081"
+      - "8081:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/game_core_db?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS=kafka:9092
       - SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_KAFKA_ADMIN_PROPERTIES_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER=org.springframework.kafka.support.serializer.JsonSerializer
     depends_on:
       mysql-db:
         condition: service_healthy
       kafka:
         condition: service_started
+
   bets-service-app:
     container_name: bets-service-app
     build:
@@ -62,17 +64,19 @@ services:
     ports:
       - "8082:8082"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/bets_db?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS=kafka:9092
       - SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_KAFKA_ADMIN_PROPERTIES_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update # <-- Añadido por consistencia
     depends_on:
       mysql-db:
         condition: service_healthy
       kafka:
         condition: service_started
+
   user-service-app:
     container_name: user-service-app
     build:
@@ -80,12 +84,17 @@ services:
     ports:
       - "8083:8083"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/user_db?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS=kafka:9092
-      - SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_KAFKA_ADMIN_PROPERTIES_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update # <-- Añadido por consistencia
+      # --- Fix para forzar el Deserializador JSON ---
+      - SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
+      - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_TRUSTED_PACKAGES=com.bjpractice.events
+      - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_USE_TYPE_HEADERS=false
+      - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_VALUE_DEFAULT_TYPE=com.bjpractice.events.BetSettledEvent
     depends_on:
       mysql-db:
         condition: service_healthy
@@ -99,27 +108,26 @@ services:
     ports:
       - "8084:8084"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/auth_db?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update # <-- Añadido por consistencia
     depends_on:
       mysql-db:
         condition: service_healthy
       kafka:
         condition: service_started
 
-  # --- API Gateway (Modo Stand-Alone) ---
+  # --- API Gateway ---
   apisix:
     image: apache/apisix:3.9.1-debian
     container_name: apisix-bjmicros
     volumes:
-      # Montamos nuestros ficheros de configuración locales sobre los del contenedor
       - ./apisix_config/config.yaml:/usr/local/apisix/conf/config.yaml
       - ./apisix_config/apisix.yaml:/usr/local/apisix/conf/apisix.yaml
     ports:
-      - "9180:9180" # Admin API
-      - "9080:9080" # Proxy
+      - "9180:9180"
+      - "9080:9080"
 
 volumes:
   mysql-data:

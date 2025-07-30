@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.MySQLContainer;
@@ -65,8 +67,20 @@ public abstract class AbstractBetIntegrationTest {
             .withEnv("SPRING_KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
             .withEnv("management.health.kafka.enabled", "false")
             .withEnv("APP_KAFKA_TOPICS_BET-SETTLED", "bets.bet-settled-test")
+            .withEnv("SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER", "org.springframework.kafka.support.serializer.JsonDeserializer")
+            .withEnv("SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_TRUSTED_PACKAGES", "com.bjpractice.events")
+            .withEnv("SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_USE_TYPE_HEADERS", "false")
+            .withEnv("SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_VALUE_DEFAULT_TYPE", "com.bjpractice.events.BetSettledEvent")
             .waitingFor(Wait.forHealthcheck())
             .withLogConsumer(new Slf4jLogConsumer(log));
+
+    @DynamicPropertySource
+    static void kafkaProperties(DynamicPropertyRegistry registry) {
+        // Conectamos el productor al Kafka de Testcontainers
+        registry.add("spring.kafka.producer.bootstrap-servers", kafka::getBootstrapServers);
+        // Forzamos el uso del JsonSerializer para los valores
+        registry.add("spring.kafka.producer.value-serializer", () -> "org.springframework.kafka.support.serializer.JsonSerializer");
+    }
 
 
 }
