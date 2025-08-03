@@ -20,27 +20,24 @@ public class GameEventListener {
     }
 
     @KafkaListener(
-            topics = "${kafka.topic.games}",
-            groupId = "bets-service-group"
+            topics = "${app.kafka.topics.games}",
+            groupId = "bets-service-group",
+            containerFactory = "gameFinishedEventContainerFactory"
     )
     public void handleGameFinishedEvent(GameFinishedEvent event){
 
         log.info("SUCCESS: Received GameFinishedEvent for betId:  {}", event.betId());
         betService.processGameResult(event);
-        // PLACEHOLDER PAL FUTURO
-        // Aquí es donde, en el futuro, buscaríamos la apuesta por su betId
-        // y la actualizaríamos con el resultado del juego.
-        // Por ahora, solo registrar el evento es suficiente.
-        // Ejemplo: betService.processGameResult(event.betId(), event.result());
+
     }
 
     @KafkaListener(
-            topics = "${kafka.topic.games}",
-            groupId = "bets-service-group"
+            topics = "${app.kafka.topics.games}",
+            groupId = "bets-service-group",
+            containerFactory = "playerDoubleEventContainerFactory"
     )
     public void handlePlayerDouble(PlayerDoubleEvent event) {
         log.info("SUCCESS: Received PlayerDoubleEvent for betId: {}", event.betId());
-        // Llamamos al nuevo método que creamos en BetService
         betService.processPlayerDouble(event);
     }
 

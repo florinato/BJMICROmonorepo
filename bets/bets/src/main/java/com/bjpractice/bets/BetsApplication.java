@@ -1,9 +1,12 @@
 package com.bjpractice.bets;
 
+import com.bjpractice.bets.config.properties.KafkaTopics;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
+@EnableConfigurationProperties(KafkaTopics.class)
 public class BetsApplication {
 
 	public static void main(String[] args) {
@@ -11,5 +14,5 @@ public class BetsApplication {
 	}
 
 
-	// AHORA NO ARRANCA POR QUE FALTA EL PRODUCTOR DE KAFKA PARA ENVIAR A USER EL RESULTADO DE LA PARTIDA
+
 }
