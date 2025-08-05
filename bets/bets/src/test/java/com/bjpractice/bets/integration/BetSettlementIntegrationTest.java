@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import java.math.BigDecimal;
@@ -26,7 +27,7 @@ import static org.awaitility.Awaitility.await;
 
 
 
-
+@ActiveProfiles("test")
 public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
 
 

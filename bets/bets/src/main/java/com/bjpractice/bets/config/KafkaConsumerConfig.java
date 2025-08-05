@@ -56,6 +56,8 @@ public class KafkaConsumerConfig {
 
 
 
+
+    // Protocolo de emergencia para los listeners
     @Bean
     public DefaultErrorHandler errorHandler() {
 

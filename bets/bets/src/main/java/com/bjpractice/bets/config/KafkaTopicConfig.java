@@ -22,7 +22,7 @@ public class KafkaTopicConfig {
     @Bean
     public NewTopic gamesTopicBean() {
         return TopicBuilder.name(kafkaTopics.games())
-                .partitions(1) // Para tests, 1 partición es suficiente y más rápido
+                .partitions(1)
                 .replicas(1)
                 .build();
     }
