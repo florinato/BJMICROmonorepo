@@ -59,14 +59,12 @@ class BetSettlementIntegrationTest extends AbstractIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Limpiamos la base de datos y la cola antes de cada test
         betRepository.deleteAll();
-
     }
 
     @Test
     void givenPlayerWins_whenGameFinishedEventIsConsumed_thenBetIsSettledAndEventIsProduced() throws InterruptedException {
-        // Arrange: Crear una apuesta inicial en la base de datos
+        // Arrange
         BetEntity initialBet = BetEntity.builder()
                 .userId(1L)
                 .amount(new BigDecimal("10.00"))
@@ -75,22 +73,22 @@ class BetSettlementIntegrationTest extends AbstractIntegrationTest {
         betRepository.save(initialBet);
 
         GameFinishedEvent gameFinishedEvent = new GameFinishedEvent(
-                UUID.randomUUID(),      // gameId
-                initialBet.getId(),     // betId
-                initialBet.getUserId(), // userId
-                "PLAYER_WINS",          // result
-                false                   // playerHasBlackjack
+                UUID.randomUUID(),
+                initialBet.getId(),
+                initialBet.getUserId(),
+                "PLAYER_WINS",
+                false                   // playerHasBlackJack
         );
 
         await().atMost(10, TimeUnit.SECONDS).until(() ->
                 !kafkaListenerEndpointRegistry.getListenerContainer("gameFinishedListener").getAssignedPartitions().isEmpty()
         );
 
-        // Act: Producir el evento de juego finalizado, simulando a game-core-service
+        // Act
         kafkaTemplate.send(kafkaTopics.games(), gameFinishedEvent);
 
-        // Assert: Verificar que el BetSettledEvent se produce y que la BBDD se actualiza
-// 1. Verificamos que el método creditUser fue llamado y capturamos sus argumentos.
+        // Assert
+
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
             // Preparamos el captor para el argumento de tipo BigDecimal
             ArgumentCaptor<BigDecimal> amountCaptor = ArgumentCaptor.forClass(BigDecimal.class);
@@ -106,7 +104,7 @@ class BetSettlementIntegrationTest extends AbstractIntegrationTest {
             assertThat(amountCaptor.getValue()).isEqualByComparingTo(new BigDecimal("20.00"));
         });
 
-        // 2. Verificamos que el estado de la apuesta en la BBDD es 'WON'. (Esta parte se mantiene igual)
+        // 2. Verificamos que el estado de la apuesta en la BBDD es 'WON'.
         await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
             BetEntity settledBet = betRepository.findById(initialBet.getId()).orElseThrow();
             assertThat(settledBet.getStatus()).isEqualTo(BetStatus.WON);

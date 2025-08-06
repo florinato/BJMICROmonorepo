@@ -5,7 +5,7 @@ Este es el plan de acción a corto plazo para avanzar con las funcionalidades cr
 
 * **Desarrollar `auth-service`:** Implementar la lógica de registro, login y emisión de tokens JWT.
 * **Implementar API Gateway (APISIX):** Configurar una instancia standalone de APISIX como puerta de entrada al sistema.
-* **Tests End-to-End (E2E):** Crear pruebas que verifiquen el flujo completo entre los servicios.
+* **Tests End-to-End (E2E):** Crear pruebas que verifiquen el flujo completo entre los servicios (Crear paquete externo)
 * **Documentación de API:** Integrar Swagger/OpenAPI en los controladores para generar la documentación.
 * **Mantenimiento de Configuración:** Unificar y mejorar la configuración de Kafka en los servicios `user` y `game-core`.
     * Utilizar un `YAML` como fuente única de verdad.
