@@ -1,6 +1,7 @@
 package com.bjpractice.bets.integration;
 
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.KafkaContainer;
@@ -16,10 +17,12 @@ import org.wiremock.integrations.testcontainers.WireMockContainer; // <--- Estud
 public abstract class AbstractIntegrationTest {
 
     @Container
+//    @ServiceConnection
     static final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
             .withKraft();
 
     @Container
+//    @ServiceConnection
     static final MySQLContainer<?> mysql = new MySQLContainer<>(DockerImageName.parse("mysql:8.0"))
             .withDatabaseName("bets_db")
             .withUsername("test")
@@ -30,9 +33,24 @@ public abstract class AbstractIntegrationTest {
     static final WireMockContainer wiremockServer = new WireMockContainer("wiremock/wiremock:3.5.4-alpine");
 
 
+
+
+//    @DynamicPropertySource
+//    static void setProperties(DynamicPropertyRegistry registry) {
+//        // La configuración de Kafka y MySQL ahora es automática gracias a @ServiceConnection.
+//        // Solo necesitamos registrar la propiedad para nuestro mock de WireMock.
+//        registry.add("game-core.api.url", wiremockServer::getBaseUrl);
+//    }
+
+    //
+
+
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
         // Configuración de Kafka
+//        registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
+
+
         registry.add("spring.kafka.consumer.bootstrap-servers", kafka::getBootstrapServers);
         registry.add("spring.kafka.producer.bootstrap-servers", kafka::getBootstrapServers);
         registry.add("spring.kafka.admin.properties.bootstrap.servers", kafka::getBootstrapServers);

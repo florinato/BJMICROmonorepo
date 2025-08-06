@@ -6,12 +6,18 @@ import com.bjpractice.bets.bet.repository.BetRepository;
 import com.bjpractice.bets.config.properties.KafkaTopics;
 import com.bjpractice.events.BetSettledEvent;
 import com.bjpractice.events.GameFinishedEvent;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestComponent;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
+import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -25,8 +31,10 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-
-
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = { "spring.kafka.bootstrap-servers=" } // <-- VOLVEMOS A PONER ESTO
+)
 @ActiveProfiles("test")
 public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
 
@@ -40,6 +48,11 @@ public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private KafkaTopics kafkaTopics;
 
+    @Autowired
+    private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+
+    @Value("${spring.application.name}")
+    private String applicationConsumerGroupId;
 
     // Usamos una cola para capturar de forma síncrona el evento que produce nuestro servicio
     private final BlockingQueue<BetSettledEvent> betSettledEvents = new LinkedBlockingQueue<>();
@@ -57,6 +70,7 @@ public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
         // Limpiamos la base de datos y la cola antes de cada test
         betRepository.deleteAll();
         betSettledEvents.clear();
+
     }
 
     @Test
@@ -75,6 +89,10 @@ public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
                 initialBet.getUserId(), // userId
                 "PLAYER_WINS",          // result
                 false                   // playerHasBlackjack
+        );
+
+        await().atMost(10, TimeUnit.SECONDS).until(() ->
+                !kafkaListenerEndpointRegistry.getListenerContainer("gameFinishedListener").getAssignedPartitions().isEmpty()
         );
 
         // Act: Producir el evento de juego finalizado, simulando a game-core-service
@@ -96,6 +114,8 @@ public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
             assertThat(settledBet.getStatus()).isEqualTo(BetStatus.WON);
         });
     }
+
+
 
 }
 

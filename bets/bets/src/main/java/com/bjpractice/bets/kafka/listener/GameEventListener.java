@@ -20,6 +20,7 @@ public class GameEventListener {
     }
 
     @KafkaListener(
+            id = "gameFinishedListener",  // Nosotros mismos definimos el id del listener, por control y mantenibilidad
             topics = "${app.kafka.topics.games}",
             groupId = "bets-service-group",
             containerFactory = "gameFinishedEventContainerFactory"
@@ -32,6 +33,7 @@ public class GameEventListener {
     }
 
     @KafkaListener(
+            id = "playerDoubleListener",
             topics = "${app.kafka.topics.games}",
             groupId = "bets-service-group",
             containerFactory = "playerDoubleEventContainerFactory"
