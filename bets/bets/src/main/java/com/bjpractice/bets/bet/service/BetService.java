@@ -92,9 +92,7 @@ public class BetService {
         if (totalReturned.compareTo(BigDecimal.ZERO) > 0) {
             log.info("PAYOUT/RETURN para userId {}: Devolviendo un total de {}", bet.getUserId(), totalReturned);
             userServiceClient.creditUser(bet.getUserId(), totalReturned);
-
         }
-
 
     }
 

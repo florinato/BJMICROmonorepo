@@ -3,9 +3,14 @@ package com.bjpractice.bets.integration;
 import com.bjpractice.bets.bet.model.BetEntity;
 import com.bjpractice.bets.bet.model.BetStatus;
 import com.bjpractice.bets.bet.repository.BetRepository;
+import com.bjpractice.bets.client.UserServiceClient;
 import com.bjpractice.bets.config.properties.KafkaTopics;
 import com.bjpractice.events.BetSettledEvent;
 import com.bjpractice.events.GameFinishedEvent;
+import org.mockito.ArgumentCaptor;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +26,9 @@ import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-
+import org.springframework.transaction.annotation.Propagation;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.hamcrest.Matchers.comparesEqualTo;
 import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
@@ -30,10 +37,12 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = { "spring.kafka.bootstrap-servers=" } // <-- VOLVEMOS A PONER ESTO
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+
 )
 @ActiveProfiles("test")
 public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
@@ -54,22 +63,17 @@ public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
     @Value("${spring.application.name}")
     private String applicationConsumerGroupId;
 
-    // Usamos una cola para capturar de forma síncrona el evento que produce nuestro servicio
-    private final BlockingQueue<BetSettledEvent> betSettledEvents = new LinkedBlockingQueue<>();
+    @MockBean
+    private UserServiceClient userServiceClient;
 
 
-    // Este listener se ejecuta en el contexto del test y añade los eventos a nuestra cola
-    @KafkaListener(topics = "${app.kafka.topics.bet-settled}", groupId = "test-group")
-    public void consumeBetSettledEvent(BetSettledEvent event) {
-        betSettledEvents.add(event);
-    }
+
 
 
     @BeforeEach
     void setUp() {
         // Limpiamos la base de datos y la cola antes de cada test
         betRepository.deleteAll();
-        betSettledEvents.clear();
 
     }
 
@@ -99,16 +103,23 @@ public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
         kafkaTemplate.send(kafkaTopics.games(), gameFinishedEvent);
 
         // Assert: Verificar que el BetSettledEvent se produce y que la BBDD se actualiza
+// 1. Verificamos que el método creditUser fue llamado y capturamos sus argumentos.
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+            // Preparamos el captor para el argumento de tipo BigDecimal
+            ArgumentCaptor<BigDecimal> amountCaptor = ArgumentCaptor.forClass(BigDecimal.class);
 
-        // 1. Verificamos que se produce el evento de pago en Kafka
-        BetSettledEvent receivedEvent = betSettledEvents.poll(10, TimeUnit.SECONDS);
+            // Verificamos la llamada. Para el userId usamos eq() y para el amount usamos el captor.
+            verify(userServiceClient).creditUser(
+                    eq(initialBet.getUserId()),
+                    amountCaptor.capture() // Capturamos el BigDecimal que se le pasó
+            );
 
-        assertThat(receivedEvent).isNotNull();
-        assertThat(receivedEvent.userId()).isEqualTo(initialBet.getUserId());
-        // El pago es la apuesta original (10) + la ganancia (10) = 20
-        assertThat(receivedEvent.amount()).isEqualByComparingTo(new BigDecimal("20.00"));
+            // Ahora, usamos AssertJ para verificar el valor capturado,
+            // comparando su valor numérico sin importar la escala.
+            assertThat(amountCaptor.getValue()).isEqualByComparingTo(new BigDecimal("20.00"));
+        });
 
-        // 2. Verificamos que el estado de la apuesta en la BBDD es 'WON'
+        // 2. Verificamos que el estado de la apuesta en la BBDD es 'WON'. (Esta parte se mantiene igual)
         await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
             BetEntity settledBet = betRepository.findById(initialBet.getId()).orElseThrow();
             assertThat(settledBet.getStatus()).isEqualTo(BetStatus.WON);
@@ -117,5 +128,5 @@ public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
 
 
 
-}
 
+}

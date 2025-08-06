@@ -26,6 +26,8 @@ public class KafkaUserServiceClient implements UserServiceClient {
     @Override
     public void creditUser(Long userId, BigDecimal amount) {
         log.info("Enviando BetSettledEvent para userId: {} con monto: {}", userId, amount);
+
+
         BetSettledEvent event = new BetSettledEvent(userId, amount);
 
         try {

@@ -1,7 +1,9 @@
 package com.bjpractice.bets.integration;
 
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.KafkaContainer;
@@ -66,3 +68,4 @@ public abstract class AbstractIntegrationTest {
         registry.add("game-core.api.url", wiremockServer::getBaseUrl);
     }
 }
+
