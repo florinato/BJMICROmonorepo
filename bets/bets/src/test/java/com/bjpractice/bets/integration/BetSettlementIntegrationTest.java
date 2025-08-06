@@ -5,34 +5,25 @@ import com.bjpractice.bets.bet.model.BetStatus;
 import com.bjpractice.bets.bet.repository.BetRepository;
 import com.bjpractice.bets.client.UserServiceClient;
 import com.bjpractice.bets.config.properties.KafkaTopics;
-import com.bjpractice.events.BetSettledEvent;
+
 import com.bjpractice.events.GameFinishedEvent;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.transaction.annotation.Transactional;
-import org.apache.kafka.clients.admin.NewTopic;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestComponent;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.KafkaListener;
+
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
-import org.springframework.kafka.core.KafkaAdmin;
+
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Propagation;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.hamcrest.Matchers.comparesEqualTo;
+
 import java.math.BigDecimal;
 import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,10 +33,9 @@ import static org.mockito.Mockito.verify;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-
 )
 @ActiveProfiles("test")
-public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
+class BetSettlementIntegrationTest extends AbstractIntegrationTest {
 
 
     @Autowired
@@ -65,9 +55,6 @@ public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
 
     @MockBean
     private UserServiceClient userServiceClient;
-
-
-
 
 
     @BeforeEach
@@ -125,8 +112,6 @@ public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
             assertThat(settledBet.getStatus()).isEqualTo(BetStatus.WON);
         });
     }
-
-
 
 
 }
