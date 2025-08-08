@@ -14,3 +14,9 @@ jwt:
 
   # Tiempo de expiración del token en milisegundos.
   expiration: 86400000 # 24 horas
+application:
+  config:
+    # URL para el Feign Client que se conecta con user-service.
+    # Lee la variable de entorno USER_SERVICE_URL (para Docker)
+    # y si no existe, usa un valor por defecto (para desarrollo local).
+    user-service-url: "${USER_SERVICE_URL:http://localhost:8083}"

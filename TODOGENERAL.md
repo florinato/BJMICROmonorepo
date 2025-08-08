@@ -16,9 +16,12 @@ Este es el plan de acción a corto plazo para avanzar con las funcionalidades cr
 ### **Tareas de Desarrollo Pendientes 💻**
 
 Funcionalidades del roadmap que aún no se han completado.
-
+URGENTE TO ESTO
 * **Integración Completa de APISIX:** Una vez standalone, configurarlo para validar tokens y enriquecer las peticiones hacia los microservicios.
-* **EXCEPTIONS PARA AUTH**
+* **EXCEPTIONS PARA AUTH** (DONE)
+* **Mirar los tests unitarios de bets y game core amen de los refactors**
+* **El SONAR**
+* **Empezar la DOCUMENTEISH (No Documentar nada que no haya pasado el Sonar)**
 ---
 
 ### **Deuda Técnica y Mejoras 🛠️**

@@ -70,7 +70,7 @@ services:
       - SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS=kafka:9092
       - SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS=kafka:9092
       - SPRING_KAFKA_ADMIN_PROPERTIES_BOOTSTRAP_SERVERS=kafka:9092
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update # <-- Añadido por consistencia
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     depends_on:
       mysql-db:
         condition: service_healthy
@@ -89,7 +89,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS=kafka:9092
       - SPRING_KAFKA_ADMIN_PROPERTIES_BOOTSTRAP_SERVERS=kafka:9092
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update # <-- Añadido por consistencia
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update a
       # --- Fix para forzar el Deserializador JSON ---
       - SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
       - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_TRUSTED_PACKAGES=com.bjpractice.events
@@ -107,16 +107,14 @@ services:
       context: ./auth/auth
     ports:
       - "8084:8084"
+
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/auth_db?createDatabaseIfNotExist=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update # <-- Añadido por consistencia
+      - USER_SERVICE_URL=http://user-service-app:8083
     depends_on:
-      mysql-db:
+      user-service-app:
         condition: service_healthy
-      kafka:
-        condition: service_started
+      # Depends on APISIX?
+
 
   # --- API Gateway ---
   apisix:
