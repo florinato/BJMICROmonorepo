@@ -1,32 +1,16 @@
+# 1. Configuración del servidor para auth-service
 server:
-  port: 8083
+  port: 8084 # Puerto para el servicio de autenticación (actualizado)
 
+# 2. Identificación de la aplicación
 spring:
   application:
-    name: user
-  datasource:
-    url: jdbc:mysql://localhost:3306/user_db?serverTimezone=UTC
-    username: root
-    password: root
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
+    name: auth-service
 
-# --- Placeholder para Service Discovery (futura integracion con ApiSix/Gateway) ---
-# eureka:
-#   client:
-#     serviceUrl:
-#       defaultZone: http://localhost:8761/eureka/
-#   instance:
-#     prefer-ip-address: true
+# 3. Propiedades personalizadas para la configuración de JWT
+jwt:
+  # La clave secreta para firmar los tokens.
+  secret: "${JWT_SECRET:c3VwZXItc2VjcmV0LWtleS1mb3ItZGV2ZWxvcG1lbnQtZW52aXJvbm1lbnQ=}"
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health"
+  # Tiempo de expiración del token en milisegundos.
+  expiration: 86400000 # 24 horas

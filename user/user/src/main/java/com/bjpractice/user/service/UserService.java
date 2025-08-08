@@ -23,15 +23,15 @@ public class UserService {
     }
 
 
-    // Este metodo tiene un bug, arreglarlo.
+
     @Transactional
     public User registerUser(String email, String username, String password) {
 
         if (userRepository.existsByEmail(email)) {
-            throw new UserAlreadyExistsException("El nombre de usuario '" + username + "' ya está en uso.");
+            throw new UserAlreadyExistsException("El email '" + email + "' ya está registrado.");
         }
         if (userRepository.existsByUsername(username)) {
-            throw new UserAlreadyExistsException("El email '" + email + "' ya está registrado.");
+            throw new UserAlreadyExistsException("El nombre de usuario '" + username + "' ya está en uso.");
         }
 
 
@@ -58,6 +58,13 @@ public class UserService {
 
         return userRepository.save(user);
 
+    }
+
+    @Transactional(readOnly = true) // Solo lectura
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con el nombre: " + username));
+        // CREAR EXCETION PERSONALIZADA
     }
 
 
