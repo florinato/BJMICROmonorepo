@@ -1,9 +1,10 @@
 package com.bjpractice.user.controller;
 
 
+import com.bjpractice.dtos.UserValidationResponse;
 import com.bjpractice.user.dto.RegisterUserRequest;
 import com.bjpractice.user.dto.UserResponse;
-import com.bjpractice.user.dto.UserValidationResponse;
+
 import com.bjpractice.user.entity.User;
 import com.bjpractice.user.service.UserService;
 import jakarta.validation.Valid;

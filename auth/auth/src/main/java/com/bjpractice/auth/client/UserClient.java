@@ -1,6 +1,6 @@
 package com.bjpractice.auth.client;
 
-import com.bjpractice.auth.dto.UserValidationResponse;
+import com.bjpractice.dtos.UserValidationResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

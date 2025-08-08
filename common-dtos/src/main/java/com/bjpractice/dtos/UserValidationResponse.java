@@ -1,10 +1,11 @@
-package com.bjpractice.user.dto;
+package com.bjpractice.dtos;
 
-import com.bjpractice.user.entity.User;
+import com.bjpractice.dtos.model.Role;
+
 
 public record UserValidationResponse(
         Long id,
         String username,
         String passwordHash,
-        User.Role role
+        Role role
 ) {}

@@ -23,6 +23,7 @@
         <module>user/user</module>
         <module>auth/auth</module>
         <module>common-events</module>
+        <module>common-dtos</module>
     </modules>
 
     <properties>

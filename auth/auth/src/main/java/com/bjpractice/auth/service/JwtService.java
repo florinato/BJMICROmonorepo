@@ -1,7 +1,7 @@
 package com.bjpractice.auth.service;
 
 
-import com.bjpractice.auth.model.Role;
+import com.bjpractice.dtos.model.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

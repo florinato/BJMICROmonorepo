@@ -1,6 +1,7 @@
 package com.bjpractice.user.entity;
 
 
+import com.bjpractice.dtos.model.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -45,10 +46,7 @@ public class User {
 
 
 
-    public enum Role{
-        USER,
-        ADMIN
-    }
+
 
 
 }

@@ -3,8 +3,10 @@ package com.bjpractice.auth.service;
 
 import com.bjpractice.auth.client.UserClient;
 import com.bjpractice.auth.dto.LoginRequest;
-import com.bjpractice.auth.dto.UserValidationResponse;
-import com.bjpractice.auth.model.Role;
+import com.bjpractice.dtos.UserValidationResponse;
+import com.bjpractice.dtos.model.Role;
+
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
