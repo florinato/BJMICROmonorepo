@@ -1,14 +1,23 @@
 package com.bjpractice.auth.service;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
+import com.bjpractice.dtos.model.Role;
+
+import java.security.Key;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+// Solo queremos saber que el token se genera adecuadamente, pues gestionar los claims será trabajo del Gateway.
 
 public class JwtServiceTest {
 
     private JwtService jwtService;
+
+    private Key signingKey;
 
     @BeforeEach
     public void setUp(){
@@ -29,22 +38,41 @@ public class JwtServiceTest {
         // @PostConstruct no se llama en los tests unitarios so lo hacemos manualmente
         jwtService.init();
 
+        this.signingKey = (Key) ReflectionTestUtils.getField(jwtService, "key");
     }
 
     @Test
-    void shouldGenerateTokenAndExtractCorrectUserId() {
+    void shouldGenerateTokenWithCorrectClaims() { // Nombre del test actualizado
         // --- Arrange ---
         Long expectedUserId = 123L;
-        Role userRole = Role.USER;
+        Role expectedRole = Role.USER;
 
-        // --- Act (Actuar) ---
-        String token = jwtService.generateToken(expectedUserId, userRole);
-        Long extractedUserId = jwtService.extractUserId(token);
+        // --- Act  ---
+        String token = jwtService.generateToken(expectedUserId, expectedRole);
 
-        // --- Assert (Verificar) ---
-        assertNotNull(token, "El token no debería ser nulo");
-        assertFalse(token.isEmpty(), "El token no debería estar vacío");
-        assertEquals(expectedUserId, extractedUserId, "El ID del usuario extraído del token no coincide con el original");
+        // --- Assert  ---
+        assertNotNull(token);
+        // Usamos nuestros propios helpers para verificar el contenido del token
+        assertEquals(expectedUserId, extractUserIdFromToken(token));
+        assertEquals(expectedRole.name(), extractRoleFromToken(token));
+    }
+
+    // ---- MÉTODOS DE AYUDA PRIVADOS DEL TEST ----
+
+    private Claims extractAllClaimsFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(this.signingKey) // Usamos la clave que guardamos
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    private Long extractUserIdFromToken(String token) {
+        return extractAllClaimsFromToken(token).get("userId", Long.class);
+    }
+
+    private String extractRoleFromToken(String token) {
+        return extractAllClaimsFromToken(token).get("role", String.class);
     }
 
 

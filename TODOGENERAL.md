@@ -18,7 +18,7 @@ Este es el plan de acción a corto plazo para avanzar con las funcionalidades cr
 Funcionalidades del roadmap que aún no se han completado.
 
 * **Integración Completa de APISIX:** Una vez standalone, configurarlo para validar tokens y enriquecer las peticiones hacia los microservicios.
-
+* **EXCEPTIONS PARA AUTH**
 ---
 
 ### **Deuda Técnica y Mejoras 🛠️**

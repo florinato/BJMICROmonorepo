@@ -60,7 +60,7 @@ public class JwtService {
 
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
@@ -73,9 +73,16 @@ public class JwtService {
                 .getBody();
     }
 
-    public Long extractUserId(String token) {
-        // Extraemos el claim 'userId' que definimos al crearlo
+
+    // TESTING STUFF
+
+    private Long extractUserId(String token) {
         return extractClaim(token, claims -> claims.get("userId", Long.class));
+    }
+
+
+    private String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
 
