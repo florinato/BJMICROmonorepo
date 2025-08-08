@@ -50,6 +50,8 @@ class BetSettlementIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
+
+    @Deprecated
     @Value("${spring.application.name}")
     private String applicationConsumerGroupId;
 
@@ -96,7 +98,7 @@ class BetSettlementIntegrationTest extends AbstractIntegrationTest {
             // Verificamos la llamada. Para el userId usamos eq() y para el amount usamos el captor.
             verify(userServiceClient).creditUser(
                     eq(initialBet.getUserId()),
-                    amountCaptor.capture() // Capturamos el BigDecimal que se le pasó
+                    amountCaptor.capture() // Capturamos el BigDecimal
             );
 
             // Ahora, usamos AssertJ para verificar el valor capturado,
