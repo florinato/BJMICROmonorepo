@@ -31,12 +31,12 @@ public class UserDetailServiceImpl implements UserDetailsService {
         try {
             UserValidationResponse userResponse = userClient.findUserForValidation(username);
 
-            // AHORA CREAMOS UNA INSTANCIA DE NUESTRA CLASE PERSONALIZADA
+            // Instancia de nuestra clase custom
             return new CustomUserDetails(
-                    userResponse.id(),           // 1. id
-                    userResponse.role(),         // 2. role
-                    userResponse.username(),     // 3. username
-                    userResponse.passwordHash()  // 4. password
+                    userResponse.id(),
+                    userResponse.role(),
+                    userResponse.username(),
+                    userResponse.passwordHash()
             );
         } catch (Exception e) {
             throw new UsernameNotFoundException("Usuario no encontrado: " + username, e);

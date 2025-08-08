@@ -22,7 +22,7 @@ public class AuthenticationService {
 
 
 
-    public AuthenticationService(JwtService jwtService, AuthenticationManager authenticationManager, UserClient userClient) {
+    public AuthenticationService(JwtService jwtService, AuthenticationManager authenticationManager) {
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
 
