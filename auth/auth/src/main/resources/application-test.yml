@@ -1,0 +1,15 @@
+# Configuración específica para el entorno de TEST
+
+# Sobrescribimos propiedades de JWT para un testing más ágil y seguro
+jwt:
+  # Usamos un secreto diferente para los tests
+  secret: "dGVzdC1zZWNyZXQta2V5LWZvci1pbnRlZ3JhdGlvbi10ZXN0aW5n"
+
+  # Expiración muy corta (5 segundos) para poder probar la caducidad del token
+  expiration: 5000 # 5 segundos en milisegundos
+
+# Aunque DynamicPropertySource lo sobrescribe, es buena práctica
+# definir la propiedad aquí para indicar que se gestiona en el test.
+application:
+  config:
+    user-service-url: "http://localhost:9999" # Valor temporal, será reemplazado por WireMock
