@@ -3,6 +3,7 @@ package com.bjpractice.auth.service;
 import com.bjpractice.auth.client.UserClient;
 import com.bjpractice.auth.model.CustomUserDetails;
 import com.bjpractice.dtos.UserValidationResponse;
+import feign.FeignException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,14 +32,14 @@ public class UserDetailServiceImpl implements UserDetailsService {
         try {
             UserValidationResponse userResponse = userClient.findUserForValidation(username);
 
-            // Instancia de nuestra clase custom
-            return new CustomUserDetails(
+            return new CustomUserDetails(  // Instancia de nuestra clase custom
                     userResponse.id(),
                     userResponse.role(),
                     userResponse.username(),
                     userResponse.passwordHash()
             );
-        } catch (Exception e) {
+        } catch (FeignException.NotFound e) {
+            // Si Feign nos da un 404, lo traducimos a una excepción que Spring Security entiende.
             throw new UsernameNotFoundException("Usuario no encontrado: " + username, e);
         }
     }
