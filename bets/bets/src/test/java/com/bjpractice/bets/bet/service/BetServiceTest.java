@@ -49,6 +49,8 @@ class BetServiceTest {
 
     @BeforeEach
     void setUp() {
+
+        Mockito.reset(userServiceClient);
         betRepository.deleteAll();
     }
 

@@ -1,14 +1,15 @@
-
 server:
   port: 8083
 
 spring:
   application:
     name: user
+
   datasource:
     url: jdbc:mysql://localhost:3306/user_db?serverTimezone=UTC
     username: root
     password: root
+
   jpa:
     show-sql: true
     hibernate:
@@ -16,37 +17,30 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
-  # --- Configuración del Consumidor de Kafka ---
 
-kafka:
-  consumer:
-    bootstrap-servers: localhost:9092
-    group-id: ${spring.application.name}
-    auto-offset-reset: earliest
-    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-    properties:
-      spring.json.trusted.packages: "com.bjpractice.events"
-      #1. Le decimos que NO espere cabeceras de tipo
-      spring.json.use.type.headers: false
-      # 2. Le decimos qué clase usar por defecto para los mensajes de este consumidor
-      spring.json.value.default.type: com.bjpractice.events.BetSettledEvent
+  # --- CONFIGURACIÓN DE KAFKA ALINEADA CON EL ESTÁNDAR ---
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: ${spring.application.name}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        # Ahora confiamos en los headers, como en bets-service.
+        # Eliminamos 'use.type.headers: false' y 'value.default.type'.
+        spring.json.trusted.packages: "com.bjpractice.events"
 
-# --- Placeholder para Service Discovery (futura integracion con ApiSix/Gateway) ---
-# eureka:
-#   client:
-#     serviceUrl:
-#       defaultZone: http://localhost:8761/eureka/
-#   instance:
-#     prefer-ip-address: true
+    # Aunque 'user' no produzca mensajes ahora, definimos la configuración
+    # para mantener la coherencia y estar preparados para el futuro.
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true # El estándar del proyecto
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health"
-
+# --- Topics de la aplicación ---
 app:
   kafka:
     topics:
