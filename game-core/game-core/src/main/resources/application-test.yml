@@ -1,35 +1,12 @@
+app:
+  kafka:
+    topics:
+      # Se sobreescribe el nombre del topic para aislar los tests
+      games: "games.game-finished.test"
+
 spring:
   kafka:
-    producer:
-      # Indica a Kafka cómo convertir el objeto Java (p.ej. GameFinishedEvent) a JSON
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-
-
-
-
-kafka:
-  topic:
-    games: "games-topic"
-
-
-
-
-## En: src/test/resources/application-test.yml
-
-
-#
-## Configuración para que los tests usen una base de datos H2 en memoria
-#spring:
-#  datasource:
-#    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
-#    username: sa
-#    password:
-#    driver-class-name: org.h2.Driver
-#  jpa:
-#    hibernate:
-#      ddl-auto: create-drop # Crea el schema al empezar y lo borra al terminar
-#    properties:
-#      hibernate:
-#        dialect: org.hibernate.dialect.H2Dialect
-#
-## Nota: No hay ninguna configuración de Kafka aquí.
+    consumer:
+      properties:
+        # Aseguramos que en los tests también se confíe en los paquetes correctos
+        spring.json.trusted.packages: "com.bjpractice.events,com.bjpractice.game_core.kafka.event"

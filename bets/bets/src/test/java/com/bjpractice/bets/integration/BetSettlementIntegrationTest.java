@@ -33,9 +33,10 @@ import static org.mockito.Mockito.verify;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+
 )
 @ActiveProfiles("test")
-class BetSettlementIntegrationTest extends AbstractIntegrationTest {
+public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
 
 
     @Autowired
@@ -50,8 +51,6 @@ class BetSettlementIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
-
-    @Deprecated
     @Value("${spring.application.name}")
     private String applicationConsumerGroupId;
 
@@ -59,14 +58,19 @@ class BetSettlementIntegrationTest extends AbstractIntegrationTest {
     private UserServiceClient userServiceClient;
 
 
+
+
+
     @BeforeEach
     void setUp() {
+
         betRepository.deleteAll();
+
     }
 
     @Test
     void givenPlayerWins_whenGameFinishedEventIsConsumed_thenBetIsSettledAndEventIsProduced() throws InterruptedException {
-        // Arrange
+
         BetEntity initialBet = BetEntity.builder()
                 .userId(1L)
                 .amount(new BigDecimal("10.00"))
@@ -79,7 +83,7 @@ class BetSettlementIntegrationTest extends AbstractIntegrationTest {
                 initialBet.getId(),
                 initialBet.getUserId(),
                 "PLAYER_WINS",
-                false                   // playerHasBlackJack
+                false
         );
 
         await().atMost(10, TimeUnit.SECONDS).until(() ->
@@ -92,26 +96,27 @@ class BetSettlementIntegrationTest extends AbstractIntegrationTest {
         // Assert
 
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            // Preparamos el captor para el argumento de tipo BigDecimal
+
             ArgumentCaptor<BigDecimal> amountCaptor = ArgumentCaptor.forClass(BigDecimal.class);
 
-            // Verificamos la llamada. Para el userId usamos eq() y para el amount usamos el captor.
+
             verify(userServiceClient).creditUser(
                     eq(initialBet.getUserId()),
-                    amountCaptor.capture() // Capturamos el BigDecimal
+                    amountCaptor.capture()
             );
 
-            // Ahora, usamos AssertJ para verificar el valor capturado,
-            // comparando su valor numérico sin importar la escala.
+
             assertThat(amountCaptor.getValue()).isEqualByComparingTo(new BigDecimal("20.00"));
         });
 
-        // 2. Verificamos que el estado de la apuesta en la BBDD es 'WON'.
+
         await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
             BetEntity settledBet = betRepository.findById(initialBet.getId()).orElseThrow();
             assertThat(settledBet.getStatus()).isEqualTo(BetStatus.WON);
         });
     }
+
+
 
 
 }

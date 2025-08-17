@@ -1,6 +1,7 @@
 package com.bjpractice.bets.integration;
 
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.KafkaContainer;
@@ -30,10 +31,11 @@ public abstract class AbstractIntegrationTest {
     static final WireMockContainer wiremockServer = new WireMockContainer("wiremock/wiremock:3.5.4-alpine");
 
 
-
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-        // Configuración de Kafka
+
+
+        // Kafka
         registry.add("spring.kafka.consumer.bootstrap-servers", kafka::getBootstrapServers);
         registry.add("spring.kafka.producer.bootstrap-servers", kafka::getBootstrapServers);
         registry.add("spring.kafka.admin.properties.bootstrap.servers", kafka::getBootstrapServers);
@@ -44,7 +46,8 @@ public abstract class AbstractIntegrationTest {
         registry.add("spring.datasource.password", mysql::getPassword);
 
         // Configuración del Mock Server
+        // La propiedad 'game-core.api.url' debe existir en el application properties para que la use UserServiceClient
+
         registry.add("game-core.api.url", wiremockServer::getBaseUrl);
     }
 }
-

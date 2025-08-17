@@ -1,9 +1,11 @@
 package com.bjpractice.game_core.kafka.producer;
 
 import com.bjpractice.events.GameFinishedEvent;
+import com.bjpractice.game_core.config.properties.KafkaTopics;
 import com.bjpractice.game_core.kafka.event.PlayerDoubleEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -14,8 +16,8 @@ import org.springframework.stereotype.Service;
 public class GameEventProducer {
 
 
-    @Value("${kafka.topic.games}")
-    private String gamesTopic;
+    @Autowired
+    private KafkaTopics kafkaTopics;
 
     private final KafkaTemplate <String, Object> kafkaTemplate;
 
@@ -23,7 +25,7 @@ public class GameEventProducer {
 
         log.info("Sending GameFinishedEvent for game id: {}", event.gameId());
         try {
-            kafkaTemplate.send(gamesTopic, event);
+            kafkaTemplate.send(kafkaTopics.games(), event);
         } catch (Exception e){
 
             log.error("Error al enviar GameFinishedEvent para gameId: {}", event.gameId(), e);
@@ -38,7 +40,7 @@ public class GameEventProducer {
     public void sendPlayerDoubledEvent(PlayerDoubleEvent event) {
         log.info("Enviando PlayerDoubledDownEvent para gameId: {}", event.getGameId());
         try {
-            kafkaTemplate.send(gamesTopic, event);
+            kafkaTemplate.send(kafkaTopics.games(), event);
         } catch (Exception e) {
             log.error("Error al enviar PlayerDoubledDownEvent para gameId: {}", event.getGameId(), e);
         }
