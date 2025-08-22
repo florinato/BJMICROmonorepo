@@ -38,8 +38,9 @@ public class UserDetailServiceImpl implements UserDetailsService {
                     userResponse.username(),
                     userResponse.passwordHash()
             );
-        } catch (FeignException.NotFound e) {
-            // Si Feign nos da un 404, lo traducimos a una excepción que Spring Security entiende.
+        } catch (Exception e) {
+            // No importa si fue un 404, un 500 o un timeout.
+            // Para Spring Security, el resultado es el mismo: el usuario no pudo ser autenticado.
             throw new UsernameNotFoundException("Usuario no encontrado: " + username, e);
         }
     }

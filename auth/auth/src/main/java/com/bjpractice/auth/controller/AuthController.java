@@ -23,10 +23,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody @Valid LoginRequest request) {
-        // 1. Llama al servicio para que haga todo el trabajo
+
         String token = authenticationService.login(request);
 
-        // 2. Envuelve el token en un DTO de respuesta y lo devuelve
+
         return ResponseEntity.ok(new JwtResponse(token));
     }
 }

@@ -11,7 +11,7 @@ import java.util.UUID;
  */
 
 
-public record StartGameRequest(
-        Long userId,
+public record StartGameBody(
+
         UUID betId)
 { }

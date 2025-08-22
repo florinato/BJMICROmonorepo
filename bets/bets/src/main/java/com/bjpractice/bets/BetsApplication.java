@@ -13,6 +13,4 @@ public class BetsApplication {
 		SpringApplication.run(BetsApplication.class, args);
 	}
 
-
-
 }

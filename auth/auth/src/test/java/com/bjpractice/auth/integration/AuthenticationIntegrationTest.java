@@ -107,34 +107,27 @@ class AuthenticationIntegrationTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.message", is("El nombre de usuario o la contraseña son incorrectos.")));
     }
 
-
+    // Debe lanzar 401 para no dar pistas!
     @Test
-    void whenUserServiceFails_thenReturns500() throws Exception {
+    void whenUserServiceFails_thenReturns401Unauthorized() throws Exception {
         // --- ARRANGE
-
-
         String username = "anyuser";
-
-
         stubFor(get(urlEqualTo("/api/v1/users/internal/validate/" + username))
                 .willReturn(aResponse()
-                        .withStatus(500) // <-- Simulamos un Internal Server Error
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{\"error\":\"database is down\"}")
+                        .withStatus(500)
                 ));
-
-
         LoginRequest loginRequest = new LoginRequest(username, "any-password");
-
 
         // --- ACT & ASSERT
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
 
-                .andExpect(status().isInternalServerError())
 
-                .andExpect(jsonPath("$.error", is("Error Interno del Servidor")));
+                .andExpect(status().isUnauthorized())
+
+
+                .andExpect(jsonPath("$.error", is("Credenciales Inválidas")));
     }
 
 

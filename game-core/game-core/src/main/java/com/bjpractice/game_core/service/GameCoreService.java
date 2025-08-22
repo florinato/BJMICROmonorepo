@@ -5,6 +5,7 @@ import com.bjpractice.events.GameFinishedEvent;
 import com.bjpractice.game_core.dto.GameDTO;
 import com.bjpractice.game_core.exception.BetAlreadyInGameException;
 import com.bjpractice.game_core.exception.GameNotFoundException;
+import com.bjpractice.game_core.exception.UnauthorizedActionException;
 import com.bjpractice.game_core.kafka.event.PlayerDoubleEvent;
 import com.bjpractice.game_core.kafka.producer.GameEventProducer;
 import com.bjpractice.game_core.mapper.GameMapper;
@@ -62,10 +63,16 @@ public class GameCoreService {
 
     // HIT
 
-    public GameDTO playerHit(UUID gameId) {
+    public GameDTO playerHit(Long userId, UUID gameId) {
 
         GameEntity gameEntity = gameRepository.findById(gameId)
                 .orElseThrow(() -> new GameNotFoundException("Partida no encontrada con id: " + gameId));
+
+        if (!gameEntity.getUserId().equals(userId)) {
+            // Si no coinciden, lanzamos una excepción de acceso denegado.
+            // Esto debería traducirse en un 403 Forbidden en tu GlobalExceptionHandler.
+            throw new UnauthorizedActionException("El usuario " + userId + " no tiene permiso para actuar en la partida " + gameId);
+        }
 
         Game game = gameEntity.getGameLogic();
 
@@ -93,10 +100,16 @@ public class GameCoreService {
 
     // STAND
 
-    public GameDTO playerStand(UUID gameId) {
+    public GameDTO playerStand(Long userId, UUID gameId) {
 
         GameEntity gameEntity = gameRepository.findById(gameId)
                 .orElseThrow(() -> new GameNotFoundException("Partida no encontrada con id: " + gameId));
+
+        if (!gameEntity.getUserId().equals(userId)) {
+            // Si no coinciden, lanzamos una excepción de acceso denegado.
+            // Esto debería traducirse en un 403 Forbidden en tu GlobalExceptionHandler.
+            throw new UnauthorizedActionException("El usuario " + userId + " no tiene permiso para actuar en la partida " + gameId);
+        }
 
 
         Game game = gameEntity.getGameLogic();
@@ -125,12 +138,18 @@ public class GameCoreService {
 
     // DOUBLE
 
-    public GameDTO playerDouble(UUID gameId) {
+    public GameDTO playerDouble(Long userId, UUID gameId) {
 
         GameEntity gameEntity = gameRepository.findById(gameId)
                 .orElseThrow(() -> new GameNotFoundException("Partida no encontrada con id " + gameId));
 
         Game game = gameEntity.getGameLogic();
+
+        if (!gameEntity.getUserId().equals(userId)) {
+            // Si no coinciden, lanzamos una excepción de acceso denegado.
+            // Esto debería traducirse en un 403 Forbidden en tu GlobalExceptionHandler.
+            throw new UnauthorizedActionException("El usuario " + userId + " no tiene permiso para actuar en la partida " + gameId);
+        }
 
         game.playerDouble();
 

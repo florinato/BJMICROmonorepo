@@ -11,7 +11,7 @@ import java.security.Key;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// Solo queremos saber que el token se genera adecuadamente, pues gestionar los claims será trabajo del Gateway.
+// Solo queremos saber que el token se genera adecuadamente, pues gestionar los claims será trabajo del Gateway!
 
 public class JwtServiceTest {
 
@@ -42,7 +42,7 @@ public class JwtServiceTest {
     }
 
     @Test
-    void shouldGenerateTokenWithCorrectClaims() { // Nombre del test actualizado
+    void shouldGenerateTokenWithCorrectClaims() {
         // --- Arrange ---
         Long expectedUserId = 123L;
         Role expectedRole = Role.USER;
@@ -52,7 +52,7 @@ public class JwtServiceTest {
 
         // --- Assert  ---
         assertNotNull(token);
-        // Usamos nuestros propios helpers para verificar el contenido del token
+
         assertEquals(expectedUserId, extractUserIdFromToken(token));
         assertEquals(expectedRole.name(), extractRoleFromToken(token));
     }

@@ -24,6 +24,7 @@
         <module>auth/auth</module>
         <module>common-events</module>
         <module>common-dtos</module>
+        <module>e2e-tests</module>
     </modules>
 
     <properties>

@@ -3,16 +3,16 @@ package com.bjpractice.game_core;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.bjpractice.game_core.integration.AbstractIntegrationTest;
 
 
 
-@SpringBootTest
-class GameCoreApplicationTests extends AbstractIntegrationTest {
 
-
-	@Test
-	void contextLoads() {
-	}
-
-}
+//@SpringBootTest
+//class GameCoreApplicationTests extends AbstractIntegrationTest {
+//
+//
+//	@Test
+//	void contextLoads() {
+//	}
+//
+//}

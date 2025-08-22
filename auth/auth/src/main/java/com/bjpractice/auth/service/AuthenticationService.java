@@ -29,7 +29,7 @@ public class AuthenticationService {
     }
 
     public String login(LoginRequest request){
-        // 1. Autenticamos. Si falla, lanza una excepción.
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.username(),
@@ -37,14 +37,14 @@ public class AuthenticationService {
                 )
         );
 
-        // 2. Extraemos nuestro CustomUserDetails del objeto Authentication
+
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        // 3. Obtenemos los datos directamente de nuestro objeto
+
         Long userId = userDetails.getId();
         Role role = userDetails.getRole();
 
-        // 4. Generamos el token. ¡No más llamadas extra a la red!
+
         return jwtService.generateToken(userId, role);
     }
 }
