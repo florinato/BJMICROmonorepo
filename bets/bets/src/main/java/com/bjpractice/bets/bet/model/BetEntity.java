@@ -41,7 +41,7 @@ public class BetEntity {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist  // est emetodo se ejecutará antes de que la entidad se guarda en la db
+    @PrePersist  // este metodo se ejecutará antes de que la entidad se guarda en la db
     protected void onCreate(){
 
         if(createdAt == null){
@@ -52,23 +52,4 @@ public class BetEntity {
         }
     }
 
-//    public BetEntity(UUID id, Long userId, UUID gameId, BigDecimal amount){
-//
-//        this.id = id;
-//        this.userId = userId;
-//        this.gameId = gameId;
-//        this.amount = amount;
-//        this.status = BetStatus.PENDING;
-//    }
-//
-//    public BetEntity(Long userId, BigDecimal amount){
-//
-//        this.id = UUID.randomUUID();
-//        this.userId = userId;
-//        this.amount = amount;
-//        this.status = BetStatus.PENDING;
-//        this.createdAt = LocalDateTime.now();
-//        this.gameId = null;
-//
-//    }
 }

@@ -10,7 +10,7 @@ import java.util.UUID;
  * y mejorando la futura extensibilidad del controlador.
  */
 
-
+// Es importante notar que el id viene de APISIX
 public record StartGameBody(
 
         UUID betId)

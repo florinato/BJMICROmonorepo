@@ -58,8 +58,6 @@ public class GameMapper {
             }
 
             dto.setDealerHand(visibleDealerHand);
-
-
         }
 
         return dto;
@@ -69,13 +67,11 @@ public class GameMapper {
     public List<CardDTO> toCardDTOList(List<Card> cards) {
 
         return cards.stream().map(this::toCardDTO).toList();
-
     }
 
     public CardDTO toCardDTO(Card card) {
 
         return new CardDTO(card.getRank().name(), card.getSuit().name());
-
     }
 
 }

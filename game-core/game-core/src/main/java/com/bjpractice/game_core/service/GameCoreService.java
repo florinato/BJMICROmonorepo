@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+
+// PENDING FOR TESTING AFTER APISIX IMPLEMENTATION
 @Service
 public class GameCoreService {
 
@@ -30,6 +32,7 @@ public class GameCoreService {
         this.gameEventProducer = gameEventProducer;
         this.gameMapper = gameMapper;
     }
+
 
 
     // START GAME
@@ -69,8 +72,7 @@ public class GameCoreService {
                 .orElseThrow(() -> new GameNotFoundException("Partida no encontrada con id: " + gameId));
 
         if (!gameEntity.getUserId().equals(userId)) {
-            // Si no coinciden, lanzamos una excepción de acceso denegado.
-            // Esto debería traducirse en un 403 Forbidden en tu GlobalExceptionHandler.
+
             throw new UnauthorizedActionException("El usuario " + userId + " no tiene permiso para actuar en la partida " + gameId);
         }
 

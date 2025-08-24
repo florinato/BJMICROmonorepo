@@ -26,7 +26,6 @@ public class KafkaConsumerConfig {
     @Bean
     public ConsumerFactory<String, Object> consumerFactory(KafkaProperties properties) {
         final var consumerProperties = properties.buildConsumerProperties(null);
-        // Permitimos que el deserializador maneje cualquier clase, ya que filtraremos después
         consumerProperties.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         return new DefaultKafkaConsumerFactory<>(consumerProperties);
     }

@@ -22,8 +22,8 @@ public class GameController {
 
     @PostMapping("/start")
     public ResponseEntity<GameDTO> startGame(
-            @RequestHeader("X-User-ID") Long userId, // 1. Leemos el ID de la cabecera
-            @RequestBody StartGameBody body) {      // 2. El cuerpo solo trae datos de negocio
+            @RequestHeader("X-User-ID") Long userId,
+            @RequestBody StartGameBody body) {
 
         GameDTO newGame = gameCoreService.startGame(userId, body.betId());
         return ResponseEntity.ok(newGame);
@@ -32,11 +32,9 @@ public class GameController {
 
     @PostMapping("/{gameId}/stand")
     public ResponseEntity<GameDTO> playerStand(
-            @RequestHeader("X-User-ID") Long userId, // 1. Leemos el ID
+            @RequestHeader("X-User-ID") Long userId,
             @PathVariable UUID gameId) {
 
-        // 2. Pasamos el userId al servicio para que pueda validar
-        // que el usuario que hace la petición es el dueño del juego.
         GameDTO updatedGame = gameCoreService.playerStand(userId, gameId);
         return ResponseEntity.ok(updatedGame);
     }

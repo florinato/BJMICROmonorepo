@@ -216,7 +216,7 @@ class BetServiceTest {
         assertEquals(BetStatus.LOST, updatedBet.getStatus());
 
 
-        // This confirms no money was returned on a loss.
+
         verify(userServiceClient, Mockito.never()).creditUser(anyLong(), any(BigDecimal.class));
     }
 

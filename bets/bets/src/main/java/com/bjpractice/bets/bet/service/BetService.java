@@ -99,15 +99,15 @@ public class BetService {
 
 
     public void processPlayerDouble(PlayerDoubleEvent event) {
-        // Buscamos la apuesta usando el betId que viene en el evento
+
         BetEntity bet = betRepository.findById(event.betId())
                 .orElseThrow(() -> new RuntimeException("Bet not found for id " + event.betId()));
 
-        // Calculamos el nuevo monto
+
         BigDecimal originalAmount = bet.getAmount();
         BigDecimal newAmount = originalAmount.multiply(BigDecimal.valueOf(2));
 
-        // Actualizamos la entidad
+
         bet.setAmount(newAmount);
         betRepository.save(bet);
 

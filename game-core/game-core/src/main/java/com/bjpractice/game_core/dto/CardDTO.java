@@ -15,7 +15,3 @@ public class CardDTO {
 
 }
 
-//public record CardDTO(
-//        String rank,
-//        String suit
-//){}

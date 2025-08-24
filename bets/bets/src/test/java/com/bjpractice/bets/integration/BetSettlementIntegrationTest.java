@@ -58,9 +58,6 @@ public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
     private UserServiceClient userServiceClient;
 
 
-
-
-
     @BeforeEach
     void setUp() {
 
@@ -99,16 +96,12 @@ public class BetSettlementIntegrationTest extends AbstractIntegrationTest {
 
             ArgumentCaptor<BigDecimal> amountCaptor = ArgumentCaptor.forClass(BigDecimal.class);
 
-
             verify(userServiceClient).creditUser(
                     eq(initialBet.getUserId()),
                     amountCaptor.capture()
             );
-
-
             assertThat(amountCaptor.getValue()).isEqualByComparingTo(new BigDecimal("20.00"));
         });
-
 
         await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
             BetEntity settledBet = betRepository.findById(initialBet.getId()).orElseThrow();
