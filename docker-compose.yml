@@ -10,6 +10,7 @@ services:
       - MYSQL_DATABASE=game_core_db
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       interval: 10s
@@ -31,7 +32,6 @@ services:
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT'
-      # --- Fix para entorno de un solo nodo ---
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
@@ -89,8 +89,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS=kafka:9092
       - SPRING_KAFKA_ADMIN_PROPERTIES_BOOTSTRAP_SERVERS=kafka:9092
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update a
-      # --- Fix para forzar el Deserializador JSON ---
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
       - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_TRUSTED_PACKAGES=com.bjpractice.events
       - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_USE_TYPE_HEADERS=false
@@ -107,14 +106,10 @@ services:
       context: ./auth/auth
     ports:
       - "8084:8084"
-
     environment:
       - USER_SERVICE_URL=http://user-service-app:8083
     depends_on:
-      user-service-app:
-        condition: service_healthy
-      # Depends on APISIX?
-
+      - user-service-app
 
   # --- API Gateway ---
   apisix:
@@ -126,6 +121,28 @@ services:
     ports:
       - "9180:9180"
       - "9080:9080"
+    environment:
+      - APISIX_STAND_ALONE=true
+    depends_on:
+      - auth-service-app
+      - user-service-app
+      - bets-service-app
+      - game-core-app
+
+  # --- SERVICIO TEST RUNNER END-TO-END ---
+
+  e2e-tester:
+    build:
+      # Debe ser la raíz del proyecto para que el e2e tenga el contexto de todo el proyecto (Un nivel por encima)
+      context: .
+      dockerfile: ./e2e-tests/Dockerfile
+    container_name: e2e_tester_runner
+    depends_on:
+      - apisix
+      - auth-service-app
+      - user-service-app
+    environment:
+      - API_GATEWAY_URL=http://apisix:9080
 
 volumes:
   mysql-data:

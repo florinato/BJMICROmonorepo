@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-//Esta clase es el traductor entre nuestro sistema de usuarios y Spring Security.
+//Esta clase es el traductor entre el sistema de usuarios y Spring Security.
 //Coge nuestro objeto UserValidationResponse y lo convierte al formato UserDetails estándar.
 //Sin esta traducción, Spring Security no sabría cómo validar a nuestros usuarios.
 
@@ -32,7 +32,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         try {
             UserValidationResponse userResponse = userClient.findUserForValidation(username);
 
-            return new CustomUserDetails(  // Instancia de nuestra clase custom
+            return new CustomUserDetails(
                     userResponse.id(),
                     userResponse.role(),
                     userResponse.username(),

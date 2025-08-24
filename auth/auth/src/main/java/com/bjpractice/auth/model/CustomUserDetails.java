@@ -11,16 +11,16 @@ import java.util.Collection;
 import java.util.List;
 
 
-// Esta clase nos permite mayor control sobre la info del usuario, nuestra versión a mdida de UserDetails de Spring
+// Esta clase permite mayor control sobre la info del usuario, nuestra versión a mdida de UserDetails de Spring
 
 
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
-    @Getter // Getter para nuestro campo personalizado
+    @Getter
     private final Long id;
 
-    @Getter // Getter para nuestro campo personalizado
+    @Getter
     private final Role role;
 
     private final String username;
@@ -47,7 +47,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // Podemos añadir esta lógica si la necesitamos en el futuro
+        return true;
     }
 
     @Override

@@ -27,7 +27,7 @@ global_rules:
       # A. Plugin de validación de JWT
       jwt-auth:
         key: "user-key" # Nombre de la clave del consumidor
-        secret: "TU_SECRET_JWT_EN_BASE64" # ¡IMPORTANTE! Reemplaza esto con tu clave secreta de JWT, la misma que en auth-service.
+        secret: "super-secret-key-for-development-environment"  # ¡IMPORTANTE! Reemplaza esto con tu clave secreta de JWT, la misma que en auth-service.
         # Por ejemplo, c3VwZXItc2VjcmV0LWtleS1mb3ItZGV2ZWxvcG1lbnQtZW52aXJvbm1lbnQ=
 
       # B. Plugin para enriquecer las cabeceras
@@ -66,73 +66,3 @@ routes:
     methods: [POST]
     upstream_id: game_core_service
     plugin_config_id: jwt_security # Aplicamos la misma regla de seguridad
-
-# Nota: El endpoint /api/v1/users/internal/validate/{username} NO se expone aquí.
-# Es una ruta interna y se queda oculta, inaccesible desde el exterior.
-# El auth-service la llama directamente usando la red de Docker.
-
-
-# ---------------------------------- ROLE VERSH ------------------------------------------------------------
-
-## apisix.yaml - Versión con Autorización por Rol
-#
-## ... (upstreams y global_rules se mantienen igual que antes) ...
-#upstreams:
-#  - id: auth_service
-#    nodes:
-#      "auth-service-app:8084": 1
-#  # ... etc
-#
-#global_rules:
-#  - id: jwt_security
-#    plugins:
-#      jwt-auth:
-#        key: "user-key"
-#        secret: "TU_SECRET_JWT_EN_BASE64"
-#      request-transformer:
-#        add:
-#          headers:
-#            - "X-User-ID:{{vars.jwt_payload.userId}}"
-#            - "X-User-Role:{{vars.jwt_payload.role}}"
-#
-## 3. Rutas (routes) con lógica de roles
-#routes:
-#  # --- RUTAS PÚBLICAS (Sin cambios) ---
-#  - id: route_login
-#    uri: /api/auth/login
-#    methods: [POST]
-#    upstream_id: auth_service
-#
-#  - id: route_register
-#    uri: /api/v1/users/register
-#    methods: [POST]
-#    upstream_id: user_service
-#
-#  # --- RUTAS PROTEGIDAS PARA USUARIOS NORMALES ---
-#  - id: route_bets
-#    uri: /api/v1/bets*
-#    methods: [POST, GET]
-#    upstream_id: bets_service
-#    plugin_config_id: jwt_security # Valida JWT y enriquece
-#
-#  - id: route_games
-#    uri: /api/v1/games*
-#    methods: [POST]
-#    upstream_id: game_core_service
-#    plugin_config_id: jwt_security # Valida JWT y enriquece
-#
-#  # --- ¡NUEVO! RUTA PROTEGIDA SOLO PARA ADMINS ---
-#  - id: route_admin_bets_report
-#    uri: /api/v1/admin/bets/report
-#    methods: [GET]
-#    upstream_id: bets_service # Imaginemos que este servicio tiene el endpoint
-#    # Aplicamos la seguridad base...
-#    plugin_config_id: jwt_security
-#    # ...Y añadimos una regla de autorización específica
-#    plugins:
-#      # Este plugin se ejecuta DESPUÉS de los de jwt_security
-#      response-rewrite:
-#        # Usamos 'vars' para crear una condición.
-#        # La petición solo procederá si la cabecera X-User-Role (añadida por el plugin anterior) es 'ADMIN'.
-#        vars:
-#          - ["http_x_user_role", "==", "ADMIN"]

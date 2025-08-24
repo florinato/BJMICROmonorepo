@@ -37,10 +37,7 @@ public class AuthenticationService {
                 )
         );
 
-
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-
-
         Long userId = userDetails.getId();
         Role role = userDetails.getRole();
 

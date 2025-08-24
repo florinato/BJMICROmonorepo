@@ -29,6 +29,7 @@ public class GlobalExceptionHandler {
 
 
     // Agrupamos varias excepciones de seguridad para dar una respuesta genérica y segura que no da pistas a posibles atacantes
+
     @ExceptionHandler({UsernameNotFoundException.class, AccountStatusException.class})
     public ResponseEntity<ErrorResponse> handleAccountStatusException(Exception ex) {
         ErrorResponse errorResponse = new ErrorResponse(
@@ -41,6 +42,7 @@ public class GlobalExceptionHandler {
 
 
     // Para errores de validación de los DTOs de entrada
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();

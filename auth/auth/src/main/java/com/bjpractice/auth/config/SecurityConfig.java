@@ -18,24 +18,17 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-
+// El micro es Stateless, de ahí esta config
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-                // Desactivamos CSRF porque nuestra API es stateless y no usa cookies de sesión.
-                .csrf(AbstractHttpConfigurer::disable)
+        HttpSecurity httpSecurity = http
 
-                // Definimos las reglas de autorización para las peticiones HTTP.
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Permitimos el acceso público a nuestro endpoint de login.
                         .requestMatchers("/api/auth/login").permitAll()
-                        // Cualquier otra petición requiere autenticación.
                         .anyRequest().authenticated()
                 )
-
-                // Configuramos la gestión de sesiones para que sea STATELESS.
-                // Spring no creará ni usará sesiones HTTP.
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
@@ -43,14 +36,13 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 2. El PasswordEncoder: Para hashear y verificar contraseñas.
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 3. El AuthenticationManager: El gestor principal de la autenticación.
-    // Lo exponemos como un Bean para poder inyectarlo en nuestro servicio de autenticación.
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
