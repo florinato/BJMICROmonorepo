@@ -94,7 +94,7 @@ public class GameEntityTestBuilder {
         Dealer dealer = new Dealer();
         dealerCards.forEach(dealer::receiveCard);
 
-        // Creamos un mazo y le ponemos exactamente las cartas que queremos, en el orden que queremos.
+
         Deck specificDeck = new Deck();
         specificDeck.setDeckList(new ArrayList<>(remainingDeck));
 

@@ -1,11 +1,31 @@
-package com.bjpractice.game_core.service;
-
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-
+//package com.bjpractice.game_core.service;
+//
+//
+//import com.bjpractice.game_core.dto.GameDTO;
+//import com.bjpractice.game_core.kafka.producer.GameEventProducer;
+//import com.bjpractice.game_core.model.Game;
+//import com.bjpractice.game_core.model.GameEntity;
+//import com.bjpractice.game_core.model.GameEntityTestBuilder;
+//import com.bjpractice.game_core.repository.GameRepository;
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.boot.test.mock.mockito.MockBean;
+//import org.springframework.test.annotation.DirtiesContext;
+//import org.springframework.test.context.TestPropertySource;
+//
+//import java.util.Optional;
+//import java.util.UUID;
+//
+//import static org.junit.Assert.*;
+//import static org.mockito.ArgumentMatchers.any;
+//import static org.mockito.Mockito.never;
+//import static org.mockito.Mockito.verify;
+//
 //@SpringBootTest
-
+//
 //@AutoConfigureTestDatabase
 //@TestPropertySource(properties = "spring.kafka.admin.enabled=false")
 //@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)

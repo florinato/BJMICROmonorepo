@@ -52,7 +52,7 @@ public class UserController {
         UserValidationResponse response = new UserValidationResponse(
                 user.getId(),
                 user.getUsername(),
-                user.getPasswordHash(), // Devolvemos el hash de la contraseña
+                user.getPasswordHash(),
                 user.getRole()
         );
 

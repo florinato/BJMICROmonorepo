@@ -75,7 +75,7 @@ public class AbstractPlayerTest {
     @Test
     void hasBlackjack_withAceAndTenValueCard_returnsTrue() {
         player.receiveCard(ace);
-        player.receiveCard(king);  // ACE + KING (10) = 21
+        player.receiveCard(king);
         assertTrue(player.hasBlackjack());
     }
 
@@ -83,14 +83,14 @@ public class AbstractPlayerTest {
     void hasBlackjack_withTwoNonAceCardsSumming21_returnsFalse() {
         player.receiveCard(king);
         player.receiveCard(ten);
-        player.receiveCard(ace);  // KING + TEN + ACE = 21, pero son 3 cartas
+        player.receiveCard(ace);
         assertFalse(player.hasBlackjack());
     }
 
     @Test
     void hasBlackjack_withAceAndNonTenValueCard_returnsFalse() {
         player.receiveCard(ace);
-        player.receiveCard(seven);  // ACE + SEVEN = 18 (no blackjack)
+        player.receiveCard(seven);
         assertFalse(player.hasBlackjack());
     }
 
@@ -98,29 +98,29 @@ public class AbstractPlayerTest {
     void hasBlackjack_withNonAceCardsSumming21_returnsFalse() {
         player.receiveCard(king);
         player.receiveCard(seven);
-        player.receiveCard(new Card(Card.Suit.HEARTS, Card.Rank.FOUR));  // 10 + 7 + 4 = 21, pero son 3 cartas
+        player.receiveCard(new Card(Card.Suit.HEARTS, Card.Rank.FOUR));
         assertFalse(player.hasBlackjack());
     }
 
     @Test
     void hasBlackjack_withLessThanTwoCards_returnsFalse() {
-        player.receiveCard(ace);  // Solo 1 carta
+        player.receiveCard(ace);
         assertFalse(player.hasBlackjack());
     }
 
     @Test
     void clearHand_removesAllCardsFromHand() {
-        // Arrange: Añadimos cartas
+        // Arrange
         player.receiveCard(ace);
         player.receiveCard(king);
-        assertEquals(2, player.getHand().size());  // Verificación previa
+        assertEquals(2, player.getHand().size());
 
-        // Act: Limpiamos la mano
+        // Act
         player.clearHand();
 
-        // Assert: Mano vacía
+        // Assert
         assertTrue(player.getHand().isEmpty());
-        assertEquals(0, player.calculateHandValue());  // Valor debería ser 0
+        assertEquals(0, player.calculateHandValue());
     }
 
 

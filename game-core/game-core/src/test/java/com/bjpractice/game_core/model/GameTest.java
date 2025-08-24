@@ -322,34 +322,24 @@ class GameTest {
 
         game.setStateForTesting(Game.GameState.PLAYER_TURN);
 
-        // Crear el mock para la mano del jugador
         List<Card> mockHand = mock(List.class);
 
-        // Configurar el comportamiento del mock para que devuelva el tamaño esperado
         when(mockHand.size()).thenReturn(2);
-
-        // Configurar el mock de getHand() para que devuelva el mock de la mano
         when(mockPlayer.getHand()).thenReturn(mockHand);
-
-        // Configurar el comportamiento del mazo y del jugador
         when(mockDeck.dealCard()).thenReturn(new Card(Card.Suit.DIAMONDS, Card.Rank.FIVE));
         when(mockPlayer.isBust()).thenReturn(false);
         when(mockPlayer.calculateHandValue()).thenReturn(19);
 
-        // Simular el turno del dealer
         when(mockDealer.calculateHandValue())
                 .thenReturn(15)
                 .thenReturn(17);
 
-        // Ejecutar la acción de doblar
         game.playerDouble();
 
-        // Verificaciones
-        verify(mockPlayer).receiveCard(any(Card.class));  // El jugador recibe una carta
-        verify(mockDealer, atLeastOnce()).calculateHandValue();  // El dealer calcula el valor de la mano
-        verify(mockDealer, atLeastOnce()).receiveCard(any(Card.class)); // El dealer recibe una carta
+        verify(mockPlayer).receiveCard(any(Card.class));
+        verify(mockDealer, atLeastOnce()).calculateHandValue();
+        verify(mockDealer, atLeastOnce()).receiveCard(any(Card.class));
 
-        // Verificar que el resultado y estado son los esperados
         assertEquals(Game.GameResult.PLAYER_WINS, game.getResult());
         assertEquals(Game.GameState.GAME_OVER, game.getState());
     }
@@ -360,26 +350,23 @@ class GameTest {
 
         game.setStateForTesting(Game.GameState.PLAYER_TURN);
 
-
         List<Card> mockHand = mock(List.class);
         when(mockHand.size()).thenReturn(2);
         when(mockPlayer.getHand()).thenReturn(mockHand);
         when(mockDeck.dealCard()).thenReturn(new Card(Card.Suit.HEARTS, Card.Rank.KING));
         when(mockPlayer.isBust()).thenReturn(true);
 
-
         game.playerDouble();
 
-
         verify(mockPlayer).receiveCard(any(Card.class));
-        verify(mockDealer, never()).receiveCard(any()); // dealer no juega
-        verify(mockDealer, never()).calculateHandValue(); // ni calcula
+        verify(mockDealer, never()).receiveCard(any());
+        verify(mockDealer, never()).calculateHandValue();
 
         assertEquals(Game.GameResult.DEALER_WINS, game.getResult());
         assertEquals(Game.GameState.GAME_OVER, game.getState());
 
-
     }
+
 
     @Test
     @DisplayName("Should throw exception for 'double' when is not the player's turn")
@@ -387,21 +374,20 @@ class GameTest {
 
         game.setStateForTesting(Game.GameState.DEALER_TURN);
 
-
         assertThrows(InvalidGameActionException.class, () -> {
             game.playerDouble();
         });
-
 
         verifyNoInteractions(mockDeck);
         verifyNoInteractions(mockPlayer);
     }
 
+
     @Test
     @DisplayName("Should throw exception for 'double' when player hand size is not 2")
     void playerDouble_ShouldThrowException_WhenHandSizeNot2() {
 
-        //Arrange
+
         game.setStateForTesting(Game.GameState.PLAYER_TURN);
         List<Card> mockHand = new ArrayList<>();
         mockHand.add(new Card(Card.Suit.HEARTS, Card.Rank.ACE));
@@ -416,8 +402,6 @@ class GameTest {
         verify(mockPlayer).getHand();
         verifyNoMoreInteractions(mockPlayer);
 
-
     }
-
 
 }

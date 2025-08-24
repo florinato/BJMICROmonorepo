@@ -19,15 +19,15 @@ class DeckTest {
     private Deck deck;
     private Player player;
 
-//    Game game = new Game();
+
 
 
     @BeforeEach
     void setUp() {
-        // Se ejecuta antes de cada test. Asegura que cada test comience con un mazo nuevo.
+
         deck = new Deck();
         deck.initializeDeck();
-        player = new Player();// Aseguramos un mazo completo para la mayoría de los tests.
+        player = new Player();
     }
 
 
@@ -36,11 +36,11 @@ class DeckTest {
         Deck deckTest = new Deck();
         deckTest.initializeDeck();
 
-        // Verificar tamaño y unicidad (sin duplicados)
+
         assertEquals(52, deck.getDeckListForTesting().size());
         assertEquals(52, deck.getDeckListForTesting().stream().distinct().count());
 
-        // Verificar todas las combinaciones suit/rank
+
         for (Card.Suit suit : Card.Suit.values()) {
             for (Card.Rank rank : Card.Rank.values()) {
                 assertTrue(deck.getDeckListForTesting().contains(new Card(suit, rank)),
@@ -52,7 +52,7 @@ class DeckTest {
     @Test
     void initializeDeck_ShouldResetDeck() {
         Deck deckTest = new Deck();
-        // Simular estado sucio (cartas existentes)
+
         deckTest.getDeckListForTesting().add(new Card(Card.Suit.HEARTS, Card.Rank.ACE));
 
         deckTest.initializeDeck(); // Debería limpiar y recrear
@@ -74,8 +74,8 @@ class DeckTest {
         // Assert
         List<Card> shuffledOrder = deckTest.getDeckListForTesting();
         assertNotEquals(originalOrder, shuffledOrder, "Deck order should change after shuffle");
-        assertEquals(originalOrder.size(), shuffledOrder.size()); // Tamaño no cambia
-        assertTrue(shuffledOrder.containsAll(originalOrder)); // Mismas cartas, diferente orden
+        assertEquals(originalOrder.size(), shuffledOrder.size());
+        assertTrue(shuffledOrder.containsAll(originalOrder));
     }
 
 
@@ -84,20 +84,20 @@ class DeckTest {
     @Test
     void shuffle_ShouldUseRandomSeed() {
         Deck deckTest = new Deck();
-        deckTest.initializeDeck(); // Inicializas la baraja para tener un orden original
+        deckTest.initializeDeck();
 
         // Usar semilla fija para reproducibilidad
         Collections.shuffle(deckTest.getDeckListForTesting(), new Random(123));
 
-        List<Card> shuffledOnce = List.copyOf(deckTest.getDeckListForTesting()); // Guardas el orden después del primer shuffle
+        List<Card> shuffledOnce = List.copyOf(deckTest.getDeckListForTesting());
 
-        // Reiniciar la baraja al estado original
+
         deckTest.initializeDeck();
 
-        // Volver a hacer el shuffle con la misma semilla
+
         Collections.shuffle(deckTest.getDeckListForTesting(), new Random(123));
 
-        // Verificar que el orden es el mismo al usar la misma semilla
+
         assertEquals(shuffledOnce, deckTest.getDeckListForTesting(), "Same seed should produce same order");
     }
 
@@ -108,18 +108,16 @@ class DeckTest {
 
         assertNotNull(dealtCard, "The dealt card should not be null.");
         assertEquals(initialSize - 1, deck.cardsRemaining(), "Deck size should decrease by one after dealing a card.");
-        // Opcional: Podrías verificar si la carta retirada ya no está en el mazo.
+
         assertFalse(deck.getDeckListForTesting().contains(dealtCard), "The dealt card should be removed from the deck.");
     }
 
     @Test
     void dealCard_ShouldDealCardsInOrderWhenNotShuffled() {
-        // Si el mazo no se baraja, las cartas deberían salir en un orden predecible.
-        // Basado en el orden de tus enumeraciones Suit (HEARTS primero) y Rank (TWO primero)
-        Card expectedFirstCard = new Card(Card.Suit.HEARTS, Card.Rank.TWO); // <-- ¡Aquí está el cambio!
 
-        // No es necesario llamar a deck.initializeDeck() de nuevo aquí,
-        // @BeforeEach ya garantiza un mazo inicializado y ordenado para cada test.
+        Card expectedFirstCard = new Card(Card.Suit.HEARTS, Card.Rank.TWO);
+
+
         Card dealtCard = deck.dealCard();
 
         assertEquals(expectedFirstCard, dealtCard, "The first dealt card should be the expected first card of a new deck.");
@@ -128,12 +126,12 @@ class DeckTest {
 
     @Test
     void dealCard_ShouldThrowDeckIsEmptyException() {
-        // Vaciamos el mazo
+
         while (deck.cardsRemaining() > 0) {
             deck.dealCard();
         }
 
-        // Verificamos que se lance la excepción correcta al intentar robar de un mazo vacío
+
         assertThrows(DeckIsEmptyException.class, () -> deck.dealCard(),
                 "Should throw NoSuchElementException when trying to deal from an empty deck.");
     }
@@ -145,15 +143,14 @@ class DeckTest {
         int cardsToDeal = 5;
         int initialDeckSize = deck.cardsRemaining();
 
-        // --- ¡Debugging aquí! ---
-        // Esto confirmará si 'player' es null ANTES de la llamada a dealCards
+
         System.out.println("DEBUG: Player instance before dealCards: " + player);
         if (player == null) {
             fail("Player instance is null in DeckTest before dealCards call. Check @BeforeEach.");
         }
-        // --- Fin Debugging ---
 
-        deck.dealCards(player, cardsToDeal); // La línea donde la NPE ocurría
+
+        deck.dealCards(player, cardsToDeal);
 
         assertEquals(cardsToDeal, player.getHand().size(),
                 "Player should receive the specified number of cards.");

@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-
+// Awaitability is key here, refer to the comments below
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserEventListenerTest extends AbstractIntegrationTest{
@@ -59,6 +59,7 @@ public class UserEventListenerTest extends AbstractIntegrationTest{
         kafkaTemplate.send(kafkaTopics.betSettled(), event);
 
         // Assert
+
         // Usamos Awaitility para esperar de forma asíncrona hasta que la aserción sea verdadera.
         // Esto es crucial porque el listener de Kafka procesa el mensaje en un hilo separado.
         await()
