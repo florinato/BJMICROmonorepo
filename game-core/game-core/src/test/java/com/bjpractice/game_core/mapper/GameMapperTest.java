@@ -31,7 +31,7 @@ class GameMapperTest {
         Long userId = 123L;
         UUID betId = UUID.randomUUID();
 
-        // ✅ CORRECCIÓN: Nombramos las variables para que reflejen la lógica real del Blackjack
+
         Card dealerCard1_hidden = new Card(Card.Suit.SPADES, Card.Rank.QUEEN);
         Card dealerCard2_visible = new Card(Card.Suit.CLUBS, Card.Rank.SEVEN);
 
@@ -42,7 +42,7 @@ class GameMapperTest {
                         new Card(Card.Suit.HEARTS, Card.Rank.TEN),
                         new Card(Card.Suit.SPADES, Card.Rank.FIVE)
                 ),
-                // El orden importa: la oculta primero, la visible después
+
                 List.of(
                         dealerCard1_hidden,
                         dealerCard2_visible
@@ -56,12 +56,12 @@ class GameMapperTest {
         assertThat(resultDTO).isNotNull();
         assertThat(resultDTO.getDealerHand()).hasSize(1); // Solo se debe ver una carta
 
-        // ✅ CORRECCIÓN: Verificamos que la carta visible es la SEGUNDA
+
         CardDTO visibleDealerCardDTO = resultDTO.getDealerHand().get(0);
         assertThat(visibleDealerCardDTO.getRank()).isEqualTo(dealerCard2_visible.getRank().name());
         assertThat(visibleDealerCardDTO.getSuit()).isEqualTo(dealerCard2_visible.getSuit().name());
 
-        // Verificamos que la puntuación visible es la de la SEGUNDA carta
+
         assertThat(resultDTO.getDealerScore()).isEqualTo(dealerCard2_visible.getValue());
     }
 
@@ -93,8 +93,8 @@ class GameMapperTest {
 
 
         assertThat(resultDTO).isNotNull();
-        assertThat(resultDTO.getDealerHand()).hasSize(2); // Se ven las dos cartas
-        assertThat(resultDTO.getDealerScore()).isEqualTo(16); // Se ve la puntuación real
+        assertThat(resultDTO.getDealerHand()).hasSize(2);
+        assertThat(resultDTO.getDealerScore()).isEqualTo(16);
     }
 
     @Test
@@ -116,7 +116,7 @@ class GameMapperTest {
     void toDTO_whenGameLogicIsNull_thenReturnsNull() {
         // ARRANGE
         GameEntity entityWithNullGame = new GameEntity(UUID.randomUUID(), 123L, UUID.randomUUID());
-        entityWithNullGame.setGameLogic(null); // Forzamos que el objeto Game interno sea nulo
+        entityWithNullGame.setGameLogic(null);
 
         // ACT
         GameDTO resultDTO = gameMapper.toDTO(entityWithNullGame);
