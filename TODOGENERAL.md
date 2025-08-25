@@ -3,6 +3,7 @@
 
 NEXT STEPS:
 
+- Trabajar en el Double y mover el evento a la carpeta de eventos comunes
 - Rehacer tests de integración y del servicio para GAME CORE
 - Test de integración para testear el correcto funcionamiento de los appends de APISIX (userId)
 

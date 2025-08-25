@@ -1,8 +1,8 @@
 package com.bjpractice.bets.config;
 
 
-import com.bjpractice.bets.kafka.event.PlayerDoubleEvent;
 import com.bjpractice.events.GameFinishedEvent;
+import com.bjpractice.events.PlayerDoubleEvent;
 import org.apache.kafka.common.errors.SerializationException;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;

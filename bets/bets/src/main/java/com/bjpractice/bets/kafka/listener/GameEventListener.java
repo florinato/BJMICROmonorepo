@@ -2,8 +2,8 @@ package com.bjpractice.bets.kafka.listener;
 
 
 import com.bjpractice.bets.bet.service.BetService;
-import com.bjpractice.bets.kafka.event.PlayerDoubleEvent;
 import com.bjpractice.events.GameFinishedEvent;
+import com.bjpractice.events.PlayerDoubleEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;

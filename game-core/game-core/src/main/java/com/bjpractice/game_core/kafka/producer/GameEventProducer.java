@@ -2,11 +2,10 @@ package com.bjpractice.game_core.kafka.producer;
 
 import com.bjpractice.events.GameFinishedEvent;
 import com.bjpractice.game_core.config.properties.KafkaTopics;
-import com.bjpractice.game_core.kafka.event.PlayerDoubleEvent;
+import com.bjpractice.events.PlayerDoubleEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -38,11 +37,11 @@ public class GameEventProducer {
     }
 
     public void sendPlayerDoubledEvent(PlayerDoubleEvent event) {
-        log.info("Enviando PlayerDoubledDownEvent para gameId: {}", event.getGameId());
+        log.info("Enviando PlayerDoubledDownEvent para gameId: {}", event.gameId());
         try {
             kafkaTemplate.send(kafkaTopics.games(), event);
         } catch (Exception e) {
-            log.error("Error al enviar PlayerDoubledDownEvent para gameId: {}", event.getGameId(), e);
+            log.error("Error al enviar PlayerDoubledDownEvent para gameId: {}", event.gameId(), e);
         }
     }
 

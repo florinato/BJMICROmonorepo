@@ -6,7 +6,7 @@ import com.bjpractice.game_core.dto.GameDTO;
 import com.bjpractice.game_core.exception.BetAlreadyInGameException;
 import com.bjpractice.game_core.exception.GameNotFoundException;
 import com.bjpractice.game_core.exception.UnauthorizedActionException;
-import com.bjpractice.game_core.kafka.event.PlayerDoubleEvent;
+import com.bjpractice.events.PlayerDoubleEvent;
 import com.bjpractice.game_core.kafka.producer.GameEventProducer;
 import com.bjpractice.game_core.mapper.GameMapper;
 import com.bjpractice.game_core.model.Game;

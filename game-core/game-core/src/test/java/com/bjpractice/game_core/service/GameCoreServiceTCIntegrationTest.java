@@ -3,7 +3,7 @@
 //import com.bjpractice.events.GameFinishedEvent;
 //import com.bjpractice.game_core.config.properties.KafkaTopics;
 //import com.bjpractice.game_core.integration.AbstractIntegrationTest;
-//import com.bjpractice.game_core.kafka.event.PlayerDoubleEvent;
+//import com.bjpractice.events.PlayerDoubleEvent;
 //import com.bjpractice.game_core.model.Card;
 //import com.bjpractice.game_core.model.Game;
 //import com.bjpractice.game_core.model.GameEntity;
