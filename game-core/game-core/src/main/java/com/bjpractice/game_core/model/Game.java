@@ -47,7 +47,7 @@ public class Game {
 
     // LOGIC
 
-    public void startGame() {
+    public boolean startGame() {
         if (state != GameState.WAITING_TO_START) {
             throw new InvalidGameActionException("Action 'start' is not allowed when game state is " + state);
         }
@@ -59,6 +59,16 @@ public class Game {
         deck.dealCards(dealer, 2);
 
         state = GameState.PLAYER_TURN;
+
+        if (player.hasBlackjack() || dealer.hasBlackjack()) {
+            state = GameState.GAME_OVER;
+            result = determineWinner();
+            return true; // <-- Informamos que el juego ha terminado.
+        } else {
+            state = GameState.PLAYER_TURN;
+            return false; // <-- Informamos que el juego continúa.
+        }
+
     }
 
 

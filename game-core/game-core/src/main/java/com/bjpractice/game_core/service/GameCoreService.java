@@ -46,11 +46,12 @@ public class GameCoreService {
         UUID gameId = UUID.randomUUID();
         GameEntity gameEntity = new GameEntity(gameId, userId, betId);
         Game game = gameEntity.getGameLogic();
-        game.startGame();
+
+        boolean gameEndedImmediately = game.startGame();
 
         gameRepository.save(gameEntity);
 
-        if (game.isGameOver()) {
+        if (gameEndedImmediately) {
             GameFinishedEvent event = new GameFinishedEvent(
                     gameEntity.getId(),
                     gameEntity.getBetId(),

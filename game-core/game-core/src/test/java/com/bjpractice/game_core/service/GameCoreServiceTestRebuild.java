@@ -1,12 +1,14 @@
 package com.bjpractice.game_core.service;
 
 
+import com.bjpractice.events.GameFinishedEvent;
 import com.bjpractice.game_core.dto.GameDTO;
 import com.bjpractice.game_core.kafka.producer.GameEventProducer;
 import com.bjpractice.game_core.mapper.GameMapper;
 import com.bjpractice.game_core.model.GameEntity;
 import com.bjpractice.game_core.model.GameEntityTestBuilder;
 import com.bjpractice.game_core.repository.GameRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 public class GameCoreServiceTestRebuild {
 
@@ -104,6 +108,52 @@ public class GameCoreServiceTestRebuild {
         assertEquals(userId, resultDTO.getUserId());
     }
 
+    @Test
+    @DisplayName("startGame() should publish GameFinishedEvent if the game ends on deal")
+    void startGame_whenGameEndsImmediately_shouldSaveAndPublishEvent() {
+
+        // ARRANGE
+
+        Long userId = 1L;
+        UUID betId = UUID.randomUUID();
+
+        when(gameRepository.findByBetId(any(UUID.class))).thenReturn(Optional.empty());
+
+
+        // ACT
+
+        gameCoreService.startGame(userId, betId);
+
+        ArgumentCaptor<GameEntity> gameEntityCaptor = ArgumentCaptor.forClass(GameEntity.class);
+        verify(gameRepository).save(gameEntityCaptor.capture());
+        GameEntity savedGame = gameEntityCaptor.getValue();
+
+        // ASSERT
+
+        // El test no es determinista, si la partida termina (Rollo blck jack) se enviará el evento a kafka
+        // si no, pues probamos que no se envió
+
+        if (savedGame.getGameLogic().isGameOver()) {
+
+            log.info("--> TEST SCENARIO: Game ended on deal. Verifying GameFinishedEvent was sent.");
+            verify(gameEventProducer).sendGameFinishedEvent(any(GameFinishedEvent.class));
+
+        } else {
+
+            log.info("--> TEST SCENARIO: Game is ongoing. Verifying no event was sent.");
+            verify(gameEventProducer, never()).sendGameFinishedEvent(any());
+        }
+
+
+    }
 
 
 }
+
+
+
+
+
+
+
+
