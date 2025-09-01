@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 
-// PENDING FOR TESTING AFTER APISIX IMPLEMENTATION
+
 @Service
 public class GameCoreService {
 
