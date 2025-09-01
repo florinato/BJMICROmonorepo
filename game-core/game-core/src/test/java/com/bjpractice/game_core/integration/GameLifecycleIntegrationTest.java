@@ -1,6 +1,7 @@
 package com.bjpractice.game_core.integration;
 
 import com.bjpractice.events.GameFinishedEvent;
+import com.bjpractice.events.PlayerDoubleEvent;
 import com.bjpractice.game_core.model.Card;
 import com.bjpractice.game_core.model.Game;
 import com.bjpractice.game_core.model.GameEntity;
@@ -42,32 +43,32 @@ public class GameLifecycleIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private GameRepository gameRepository;
 
-    private Consumer<String, GameFinishedEvent> consumer;
+    private Consumer<String, Object> consumer;
 
-    // TODO: Necesitaremos un consumidor de Kafka para verificar los eventos.
-    // Lo configuraremos en el siguiente paso.
 
     @BeforeEach
     void cleanup() {
-        // Limpiamos la base de datos antes de cada test para asegurar el aislamiento.
+
         gameRepository.deleteAll();
 
-        // 2. Configuramos y creamos el consumidor antes de cada test
+
         Map<String, Object> consumerProps = KafkaTestUtils.consumerProps(kafka.getBootstrapServers(), "test-group", "true");
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class.getName());
         consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "com.bjpractice.events");
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        // This allows the deserializer to determine the type from message headers
+        consumerProps.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, "true");
 
-        DefaultKafkaConsumerFactory<String, GameFinishedEvent> cf = new DefaultKafkaConsumerFactory<>(consumerProps);
+
+        DefaultKafkaConsumerFactory<String, Object> cf = new DefaultKafkaConsumerFactory<>(consumerProps);
         consumer = cf.createConsumer();
-        // Nos suscribimos al topic que nos interesa (asumiendo el nombre 'games-topic')
         consumer.subscribe(java.util.Collections.singletonList("games.game-finished.test"));
     }
 
     @AfterEach
     void tearDown() {
-        // Cerramos el consumidor después de cada test
+
         if (consumer != null) {
             consumer.close();
         }
@@ -76,30 +77,34 @@ public class GameLifecycleIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void startGame_shouldSaveToDbAndPublishEventOnBlackjack() {
-        // --- ARRANGE ---
+        // ARRANGE
         Long userId = 1L;
         UUID betId = UUID.randomUUID();
 
-        // --- ACT ---
-        // Llamamos al servicio. El test es no-determinista, así que cruzamos los dedos para un Blackjack.
+        // ACT
+
         gameCoreService.startGame(userId, betId);
 
-        // --- ASSERT ---
-        // 1. Verificación de la Base de Datos (como antes)
+        //  ASSERT
+
         GameEntity savedGame = gameRepository.findByBetId(betId).orElseThrow();
         assertThat(savedGame.getUserId()).isEqualTo(userId);
 
-        // 2. Verificación de Kafka (la nueva parte)
+
         if (savedGame.getGameLogic().isGameOver()) {
             System.out.println("--> BLACKJACK! Verifying Kafka event...");
 
-            // Usamos Awaitility para esperar el mensaje
+
             await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-                ConsumerRecords<String, GameFinishedEvent> records = consumer.poll(Duration.ofMillis(100));
+                ConsumerRecords<String, Object> records = consumer.poll(Duration.ofMillis(100));
                 assertThat(records.count()).isEqualTo(1);
 
-                ConsumerRecord<String, GameFinishedEvent> eventRecord = records.iterator().next();
-                GameFinishedEvent event = eventRecord.value();
+                ConsumerRecord<String, Object> eventRecord = records.iterator().next();
+                Object eventObject = eventRecord.value();
+
+                assertThat(eventObject).isInstanceOf(GameFinishedEvent.class);
+
+                GameFinishedEvent event = (GameFinishedEvent) eventObject;
 
                 assertThat(event.userId()).isEqualTo(userId);
                 assertThat(event.betId()).isEqualTo(betId);
@@ -138,8 +143,10 @@ public class GameLifecycleIntegrationTest extends AbstractIntegrationTest {
 
         assertThat(updatedGame.getGameLogic().getPlayer().getHand().size()).isEqualTo(3);
 
-        ConsumerRecords<String, GameFinishedEvent> records = consumer.poll(Duration.ofMillis(1000));
-        assertThat(records.isEmpty()).isTrue();
+        ConsumerRecords<String, Object> records = consumer.poll(Duration.ofMillis(200));
+        assertThat(records.isEmpty())
+                .as("No Kafka event should be published for a non-busting hit")
+                .isTrue();
     }
 
     // STAND
@@ -176,15 +183,76 @@ public class GameLifecycleIntegrationTest extends AbstractIntegrationTest {
 
 
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            ConsumerRecords<String, GameFinishedEvent> records = consumer.poll(Duration.ofMillis(100));
+            ConsumerRecords<String, Object> records = consumer.poll(Duration.ofMillis(100));
             assertThat(records.count()).isEqualTo(1);
 
-            ConsumerRecord<String, GameFinishedEvent> eventRecord = records.iterator().next();
-            GameFinishedEvent event = eventRecord.value();
+            ConsumerRecord<String, Object> eventRecord = records.iterator().next();
+            Object eventObject = eventRecord.value();
+
+
+            assertThat(eventObject).isInstanceOf(GameFinishedEvent.class);
+
+
+            GameFinishedEvent event = (GameFinishedEvent) eventObject;
 
             assertThat(event.userId()).isEqualTo(userId);
             assertThat(event.betId()).isEqualTo(betId);
             assertThat(event.result()).isEqualTo("DEALER_WINS");
+        });
+    }
+
+    // DOUBLE
+
+    @Test
+    @DisplayName("playerDouble() should save final state and publish two events")
+    void playerDouble_whenSuccessful_shouldSaveToDbAndPublishTwoEvents() {
+
+        // ARRANGE
+        Long userId = 1L;
+        UUID betId = UUID.randomUUID();
+
+
+        List<Card> playerHand = List.of(new Card(Card.Suit.HEARTS, Card.Rank.FIVE), new Card(Card.Suit.SPADES, Card.Rank.SIX));
+        List<Card> dealerHand = List.of(new Card(Card.Suit.CLUBS, Card.Rank.TEN));
+        List<Card> remainingDeck = List.of(new Card(Card.Suit.CLUBS, Card.Rank.TEN), new Card(Card.Suit.DIAMONDS, Card.Rank.SEVEN)); // Player gets 10, dealer gets 7
+
+        GameEntity initialGame = GameEntityTestBuilder.createGameWithPredefinedDeck(
+                userId, betId, playerHand, dealerHand, remainingDeck
+        );
+        gameRepository.save(initialGame);
+
+        // ACT
+        gameCoreService.playerDouble(initialGame.getUserId(), initialGame.getId());
+
+        // ASSERT
+
+        GameEntity finalGame = gameRepository.findById(initialGame.getId()).orElseThrow();
+        assertThat(finalGame.getGameLogic().getState()).isEqualTo(Game.GameState.GAME_OVER);
+        assertThat(finalGame.getGameLogic().getResult()).isEqualTo(Game.GameResult.PLAYER_WINS);
+
+
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+            ConsumerRecords<String, Object> records = consumer.poll(Duration.ofMillis(500));
+
+            assertThat(records.count()).isEqualTo(2);
+
+            boolean foundDoubleEvent = false;
+            boolean foundFinishedEvent = false;
+
+            for (ConsumerRecord<String, Object> record : records) {
+                if (record.value() instanceof PlayerDoubleEvent event) {
+                    foundDoubleEvent = true;
+                    assertThat(event.userId()).isEqualTo(userId);
+                    assertThat(event.betId()).isEqualTo(betId);
+                } else if (record.value() instanceof GameFinishedEvent event) {
+                    foundFinishedEvent = true;
+                    assertThat(event.userId()).isEqualTo(userId);
+                    assertThat(event.betId()).isEqualTo(betId);
+                    assertThat(event.result()).isEqualTo("PLAYER_WINS");
+                }
+            }
+            assertThat(foundDoubleEvent).isTrue();
+            assertThat(foundFinishedEvent).isTrue();
         });
     }
 
