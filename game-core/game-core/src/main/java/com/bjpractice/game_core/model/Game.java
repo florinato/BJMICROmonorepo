@@ -63,10 +63,10 @@ public class Game {
         if (player.hasBlackjack() || dealer.hasBlackjack()) {
             state = GameState.GAME_OVER;
             result = determineWinner();
-            return true; // <-- Informamos que el juego ha terminado.
+            return true;
         } else {
             state = GameState.PLAYER_TURN;
-            return false; // <-- Informamos que el juego continúa.
+            return false;
         }
 
     }
