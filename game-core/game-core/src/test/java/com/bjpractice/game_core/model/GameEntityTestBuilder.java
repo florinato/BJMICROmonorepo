@@ -21,6 +21,24 @@ public class GameEntityTestBuilder {
         return entity;
     }
 
+    public static GameEntity createGameInPlayerTurnDeterministicVersh(Long userId, UUID betId) {
+        // We will no longer use the random startGame(). Instead, we'll build the
+        // game state manually to ensure it's always the same.
+
+        // Define a simple, non-winning hand.
+        List<Card> playerHand = List.of(
+                new Card(Card.Suit.HEARTS, Card.Rank.TWO),
+                new Card(Card.Suit.CLUBS, Card.Rank.SEVEN) // Player score is 9
+        );
+        List<Card> dealerHand = List.of(
+                new Card(Card.Suit.DIAMONDS, Card.Rank.FIVE),
+                new Card(Card.Suit.SPADES, Card.Rank.TEN) // Dealer shows a Ten
+        );
+
+        // Use a builder method that creates a game with specific cards.
+        return createGameInProgressWithSpecificCards(userId, betId, playerHand, dealerHand);
+    }
+
     public static GameEntity createFinishedGame(Long userId, UUID betId) {
 
         GameEntity entity = createGameInPlayerTurn(userId, betId);
